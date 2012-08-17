@@ -1,0 +1,2 @@
+These files are only used in administration.php. Needed to make the user list
+searchable and was/am on a deadline so reusing old code was the best way to do it.

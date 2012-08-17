@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/evaluations/db" VERSION="20110805" COMMENT="XMLDB file for Moodle local/evaluations"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+    <TABLES>
+        <TABLE NAME="evaluations" COMMENT="Default comment for evaluations, please edit me" NEXT="evaluation_compare">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
+                <FIELD NAME="course" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="start_time"/>
+                <FIELD NAME="start_time" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="course" NEXT="end_time"/>
+                <FIELD NAME="end_time" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="start_time" NEXT="name"/>
+                <FIELD NAME="name" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="end_time" NEXT="deleted"/>
+                <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="name" NEXT="email_students"/>
+                <FIELD NAME="email_students" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="deleted" NEXT="complete"/>
+                <FIELD NAME="complete" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="email_students" NEXT="department"/>
+                <FIELD NAME="department" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="complete"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluation_compare" COMMENT="Default comment for evaluations, please edit me" PREVIOUS="evaluations" NEXT="evaluation_questions">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="evalids"/>
+                <FIELD NAME="evalids" TYPE="text" LENGTH="small" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluation_questions" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluation_compare" NEXT="evaluation_response">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="evalid"/>
+                <FIELD NAME="evalid" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Evaluation Table id" PREVIOUS="id" NEXT="question"/>
+                <FIELD NAME="question" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="evalid" NEXT="type"/>
+                <FIELD NAME="type" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Type of Question - id" PREVIOUS="question" NEXT="question_order"/>
+                <FIELD NAME="question_order" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="type" NEXT="isstd"/>
+                <FIELD NAME="isstd" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="question_order"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="evalid"/>
+                <KEY NAME="evalid" TYPE="foreign" FIELDS="evalid" REFTABLE="evaluations" REFFIELDS="id" PREVIOUS="primary"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluation_response" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluation_questions" NEXT="evaluation_standard_question">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="question_id"/>
+                <FIELD NAME="question_id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="ID of the question" PREVIOUS="id" NEXT="response"/>
+                <FIELD NAME="response" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="question_id" NEXT="user_id"/>
+                <FIELD NAME="user_id" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="response" NEXT="question_comment"/>
+                <FIELD NAME="question_comment" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="user_id"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="questions"/>
+                <KEY NAME="questions" TYPE="foreign" FIELDS="question_id" REFTABLE="evaluation_questions" REFFIELDS="id" PREVIOUS="primary" NEXT="user_id"/>
+                <KEY NAME="user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id" PREVIOUS="questions"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluation_standard_question" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluation_response" NEXT="evaluations_question_types">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="question"/>
+                <FIELD NAME="question" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="type"/>
+                <FIELD NAME="type" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" COMMENT="Type of questions" PREVIOUS="question" NEXT="question_order"/>
+                <FIELD NAME="question_order" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="type" NEXT="department"/>
+                <FIELD NAME="department" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="question_order"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluations_question_types" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluation_standard_question" NEXT="evaluations_email_log">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+                <FIELD NAME="name" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="class"/>
+                <FIELD NAME="class" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluations_email_log" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluations_question_types" NEXT="evaluations_mail_que">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="evalid"/>
+                <FIELD NAME="evalid" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="evalid" NEXT="end_sent"/>
+                <FIELD NAME="end_sent" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="student_reminders"/>
+                <FIELD NAME="student_reminders" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="end_sent"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluations_mail_que" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluations_email_log" NEXT="evaluations_early_reminder">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userto"/>
+                <FIELD NAME="userto" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="from_title"/>
+                <FIELD NAME="from_title" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="userto" NEXT="subject"/>
+                <FIELD NAME="subject" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="from_title" NEXT="body"/>
+                <FIELD NAME="body" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="subject" NEXT="body_html"/>
+                <FIELD NAME="body_html" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="body" NEXT="date_queued"/>
+                <FIELD NAME="date_queued" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="body_html" NEXT="log_id"/>
+                <FIELD NAME="log_id" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="date_queued" NEXT="email_type"/>
+                <FIELD NAME="email_type" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="log_id"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluations_early_reminder" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluations_mail_que" NEXT="evaluations_invigilators">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
+                <FIELD NAME="course" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="date_sent"/>
+                <FIELD NAME="date_sent" TYPE="int" LENGTH="20" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="course"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="evaluations_invigilators" COMMENT="Default comment for the table, please edit me" PREVIOUS="evaluations_early_reminder" NEXT="department_administrators">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="evalid"/>
+                <FIELD NAME="evalid" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="evalid"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="department_administrators" COMMENT="Ability to administrate. of evaluations for a department." PREVIOUS="evaluations_invigilators" NEXT="department_preambles">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="id" NEXT="department"/>
+                <FIELD NAME="department" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="userid"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="department_preambles" COMMENT="Pramble for a department." PREVIOUS="department_administrators">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="preamble"/>
+                <FIELD NAME="preamble" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="department"/>
+                <FIELD NAME="department" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="preamble"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        
+    </TABLES>
+</XMLDB>
