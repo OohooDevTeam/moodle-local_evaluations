@@ -1,4 +1,19 @@
 <?php
+/**
+ * ************************************************************************
+ * *                              Evaluation                             **
+ * ************************************************************************
+ * @package     local                                                    **
+ * @subpackage  Evaluation                                               **
+ * @name        Evaluation                                               **
+ * @copyright   oohoo.biz                                                **
+ * @link        http://oohoo.biz                                         **
+ * @author      Dustin Durrand           				 **
+ * @author      (Modified By) James Ward   				 **
+ * @author      (Modified By) Andrew McCann				 **
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
+ * ************************************************************************
+ * ********************************************************************** */
 
 require_once('../../config.php');
 global $DB, $PAGE, $CFG, $USER;
@@ -6,7 +21,6 @@ require_once('lib.php');
 require_once('tcpdf/config/lang/eng.php');
 require_once('tcpdf/tcpdf.php');
 require_once('classes/anonym_report_PDF.php');
-require_once('classes/admin_report_PDF.php');
 
 require_once('locallib.php');
 
@@ -59,7 +73,6 @@ switch ($type) {
 
     case 'admin':
         //admin_report($eval, $course, $is_admin,$download);
-         anonymous_report($eval, $course, $teacher, $download);
         break;
 }
 

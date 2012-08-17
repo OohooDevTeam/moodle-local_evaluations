@@ -1,9 +1,22 @@
 <?php
+/**
+ * ************************************************************************
+ * *                              Evaluation                             **
+ * ************************************************************************
+ * @package     local                                                    **
+ * @subpackage  Evaluation                                               **
+ * @name        Evaluation                                               **
+ * @copyright   oohoo.biz                                                **
+ * @link        http://oohoo.biz                                         **
+ * @author      Dustin Durrand           				 **
+ * @author      (Modified By) James Ward   				 **
+ * @author      (Modified By) Andrew McCann				 **
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
+ * ************************************************************************
+ * ********************************************************************** */
 
 /**
  * Description of question_set
- *
- * @author dddurand
  */
 class evaluation {
 

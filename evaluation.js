@@ -1,4 +1,20 @@
-//javascript that runs on the teachers evaluation setup page. Removes the delete/up/down
+/**
+ * ************************************************************************
+ * *                              Evaluation                             **
+ * ************************************************************************
+ * @package     local                                                    **
+ * @subpackage  Evaluation                                               **
+ * @name        Evaluation                                               **
+ * @copyright   oohoo.biz                                                **
+ * @link        http://oohoo.biz                                         **
+ * @author      Dustin Durrand           				 **
+ * @author      (Modified By) James Ward   				 **
+ * @author      (Modified By) Andrew McCann				 **
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
+ * ************************************************************************
+ * ********************************************************************** */
+
+////javascript that runs on the teachers evaluation setup page. Removes the delete/up/down
 //buttons and locks the types of questions so we will be able to compare them later on 
 //without running into errors.
 
