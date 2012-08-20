@@ -14,6 +14,14 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
+define('EVAL_STATUS_DELETED', -4);
+define('EVAL_STATUS_ENDTIME_LESS_STARTTIME', -3);
+define('EVAL_STATUS_COMPLETE_BEFORE_ENDTIME', -1);
+define('EVAL_STATUS_ERROR', 0);
+define('EVAL_STATUS_PRESTART', 1);
+define('EVAL_STATUS_INPROGRESS', 2);
+define('EVAL_STATUS_COMPLETE', 3);
+
 
 function get_instructing_courses() {
 //    
