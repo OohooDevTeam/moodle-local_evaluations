@@ -194,6 +194,7 @@ function table_header() {
  * @param stdClass[] $evals An array of evaluations pulled from the database.
  */
 function print_evaluations($evals) {
+    global $dept;
     if ($evals == null || count($evals) == 0) {
         //If there were no evaluations let the users know.
         echo '<tr><td colspan=8>' . get_string('none', 'local_evaluations') . '</td></tr>';
