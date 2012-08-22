@@ -14,7 +14,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
+/**
+ * Displays the preamble form.
+ */
 require_once("$CFG->libdir/formslib.php");
 
 class preamble_form extends moodleform {

@@ -14,57 +14,27 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
+/**
+ * This page allows department administrators to decide what reports will be used
+ * for comparisons when generating the reports.
+ */
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-global $CFG, $DB;
-
 require_once('locallib.php');
-//post values
+
+// ----- Parameters ----- //
 $searchstring = optional_param('search', NULL, PARAM_RAW);
 $page = optional_param('page', 0, PARAM_INT);   // which page to show
 $perpage = optional_param('perpage', 10, PARAM_INT);   // how many per page
 $clear = optional_param('clear', NULL, PARAM_RAW);
 $dept = required_param('dept', PARAM_TEXT);
 
-
-
-if (isset($clear)) {
-    $DB->delete_records_select('evaluation_compare', '');
-} else if (!empty($_POST) && !isset($_POST['search']) && !isset($_POST['page']) && !isset($_POST['perpage'])) {
-
-    $evalIds = '';
-    foreach ($_POST as $key => $value) {
-        $evalIds .= "$key;";
-    }
-
-    $sql = "SELECT COUNT(*) FROM {$CFG->prefix}evaluation_compare";
-    if ($DB->count_records_sql($sql) > 0) {
-        $data = new stdClass();
-        $data->evalids = $evalIds;
-        //delete all the records from evaluation_compare
-        $DB->delete_records_select('evaluation_compare', '');
-        //add the new ones.
-        $DB->insert_record('evaluation_compare', $data);
-    } else {
-        $data = new stdClass();
-        $data->evalids = $evalIds;
-        $data->id = 1;
-        $DB->insert_record('evaluation_compare', $data);
-    }
-}
-//security check
-$context = get_context_instance(CONTEXT_SYSTEM);
-$PAGE->set_context($context);
-
-//Confirm this person is an admin for this dept.
-
+// ----- Security ----- //
+require_login();
 if (!is_dept_admin($dept, $USER)) {
     print_error(get_string('restricted', 'local_evaluations'));
 }
 
-
-$PAGE->set_url($CFG->wwwroot . '/local/evaluations/coursecompare.php?dept=' . $dept);
-
+// ----- Naviagtion ----- //
 $navlinks = array(
     array(
         'name' => get_string('nav_ev_mn', 'local_evaluations'),
@@ -87,30 +57,56 @@ $navlinks = array(
         'type' => 'misc'
     )
 );
-
-
 $nav = build_navigation($navlinks);
 
-
+// ----- Stuff ----- //
+$PAGE->set_url($CFG->wwwroot . '/local/evaluations/coursecompare.php?dept=' . $dept);
+$context = get_context_instance(CONTEXT_SYSTEM);
+$PAGE->set_context($context);
 $PAGE->set_title(get_string('nav_cs_mx', 'local_evaluations'));
 $PAGE->set_heading(get_string('nav_cs_mx', 'local_evaluations'));
 $PAGE->requires->css('/local/evaluations/style.css');
-require_login();
 
+// ----- Handle Parameters ----- //
+if (isset($clear)) {
+    //Remove all records from course compare if clear is selected
+    $DB->delete_records_select('evaluation_compare', '');
+} else if (!empty($_POST) && !isset($_POST['search']) && !isset($_POST['page']) && !isset($_POST['perpage'])) {
+    //If search, page, and perpage are all empty then the page was probably submitted with 
+    //a list of courses that we want to compare.
+    $evalIds = '';
+    foreach ($_POST as $key => $value) {
+        $evalIds .= "$key;";
+    }
+    //G
+    $sql = "SELECT COUNT(*) FROM {$CFG->prefix}evaluation_compare";
+    if ($DB->count_records_sql($sql) > 0) {
+        $data = new stdClass();
+        $data->evalids = $evalIds;
+        //delete all the records from evaluation_compare
+        $DB->delete_records_select('evaluation_compare', '');
+        //add the new ones.
+        $DB->insert_record('evaluation_compare', $data);
+    } else {
+        $data = new stdClass();
+        $data->evalids = $evalIds;
+        $data->id = 1;
+        $DB->insert_record('evaluation_compare', $data);
+    }
+}
 
-
-//Display Form
+// ----- Output ----- //
 echo $OUTPUT->header();
+
 
 if (isset($searchstring)) {
     $searchterms = explode(" ", $searchstring);
-    $courses = get_courses_search($searchterms, "fullname ASC", 0, 50, &$totalcount);
+    $courses = get_courses_search($searchterms, "fullname ASC", 0, 50, $totalcount);
 } else {
-
     $totalcount = $DB->count_records('course');
     $url = new moodle_url($CFG->wwwroot . '/local/evaluations/coursecompare.php', array('perpage' => $perpage));
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url);
-    $courses = get_courses_page($categoryid = "all", $sort = "c.fullname ASC", $fields = "c.*", &$totalcount, $perpage * $page, $perpage);
+    $courses = get_courses_page($categoryid = "all", $sort = "c.fullname ASC", $fields = "c.*", $totalcount, $perpage * $page, $perpage);
 }
 
 echo '<form action=' . $PAGE->url . ' method="post"><table width="95%" cellpadding="1" style="text-align: center;">';

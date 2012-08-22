@@ -22,99 +22,66 @@ define('EVAL_STATUS_PRESTART', 1);
 define('EVAL_STATUS_INPROGRESS', 2);
 define('EVAL_STATUS_COMPLETE', 3);
 
-
+/**
+ * Get the courses that the given user is teaching
+ * @global stdClass $USER
+ * @return stdClass the result from the moodle function get_user_courses_bycap
+ */
 function get_instructing_courses() {
-//    
-//    $courses = enrol_get_my_courses();
-//
-//    $capability = 'local/evaluations:instructor';
-//
-//    foreach ($courses as $id => $course) {
-//        $context = get_context_instance(CONTEXT_COURSE, $course->id);
-//
-//        if (!has_capability($capability, $context)) {
-//            unset($courses[$id]);
-//        }
-//    }
-//    return $courses;
     global $USER;
     return get_user_courses_bycap($USER->id, 'local/evaluations:instructor',
                     array(), false, $sort = 'c.sortorder ASC', NULL, $limit = 20);
 }
 
-//james custom //i don't think this gets used anywhere 
-function get_course_eval_admin_courses() {
-    global $USER, $DB;
-    $sql = "SELECT ra.id as raid, ra.contextid, ra.component, ctx.contextlevel, ra.roleid, u.*, ue.lastseen
-                    FROM {role_assignments} ra
-                    JOIN {user} u ON u.id = ra.userid
-                    JOIN {context} ctx ON ra.contextid = ctx.id
-               LEFT JOIN (
-                       SELECT ue.id, ue.userid, ul.timeaccess AS lastseen
-                         FROM {user_enrolments} ue
-                    LEFT JOIN {enrol} e ON e.id=ue.enrolid
-                    LEFT JOIN {user_lastaccess} ul ON (ul.courseid = e.courseid AND ul.userid = ue.userid)
-                        WHERE e.courseid = :courseid
-                       ) ue ON ue.userid=u.id
-                   WHERE ctx.id $ctxcondition AND
-                         ue.id IS NULL
-                ORDER BY u.$sort $direction, ctx.depth DESC";
-
-    $stuff = $DB->get_records_sql($sql);
-    return $stuff;
-    //return get_user_courses_bycap($USER->id, 'local/evaluations:course_eval_admin', array(), false, $sort = 'c.sortorder ASC', NULL, $limit = 20);
-}
-
-//james
-
+/**
+ * Creates an html string that represents the given object.
+ * 
+ * @param  mixed $eval Either an object that can be grabed from the evaluations table
+ *              or an int that is the evaluation id from that table.
+ * @return string HTML
+ */
 function get_eval_status($eval) {
     $status = '';
 
     switch (eval_check_status($eval)) {
 
-        case 3:
+        case EVAL_STATUS_COMPLETE:
             $status .= '<span class="eval_status complete">';
             $status .= get_string('complete', 'local_evaluations');
             $status .= '</span>';
             break;
 
-        case -1:
+        case EVAL_STATUS_COMPLETE_BEFORE_ENDTIME:
             $status .= '<span class="eval_status error">';
             $status .= 'error: Completed before end_time';
             $status .= '</span>';
             break;
 
-//        case -2:
-//            $status .= '<span class="eval_status error">';
-//            $status.='Error: Eval Beyond End Time& and hasn\'t completed';
-//            $status .= '</span>';
-//            break;
-
-        case -3:
+        case EVAL_STATUS_ENDTIME_LESS_STARTTIME:
             $status .= '<span class="eval_status error">';
             $status.='Error: end is less(equal) than the start time';
             $status .= '</span>';
             break;
 
-        case -4:
+        case EVAL_STATUS_DELETED:
             $status .= '<span class="eval_status error">';
             $status.='Error: Evaluation deleted';
             $status .= '</span>';
             break;
 
-        case 2:
+        case EVAL_STATUS_INPROGRESS:
             $status .= '<span class="eval_status inprogress">';
             $status .= get_string('inprogress', 'local_evaluations');
             $status .= '</span>';
             break;
 
-        case 1:
+        case EVAL_STATUS_PRESTART:
             $status .= '<span class="eval_status prestart">';
             $status .= get_string('beforestart', 'local_evaluations');
             $status .= '</span>';
             break;
 
-        case 0:
+        case EVAL_STATUS_ERROR:
             $status .= '<span class="eval_status error">';
             $status = get_string('Error', 'local_evaluations');
             $status .= '</span>';
@@ -124,13 +91,22 @@ function get_eval_status($eval) {
     return $status;
 }
 
-//1 = pre-start, 2= inprogress, 3 = complete
-//0 = unknown error,
-//-1 =endtime hasn't happened - and is complete
-//-3 end less than start time
-//-4 deleted
-//Will set an eval to complete if end < current time & not complete
-
+/**
+ * Gets the status of an evaluation. These are all the possible statuses
+ * 
+ * EVAL_STATUS_DELETED
+ * EVAL_STATUS_ENDTIME_LESS_STARTTIME
+ * EVAL_STATUS_COMPELTE_BEFORE_ENDTIME
+ * EVAL_STATUS_ERROR
+ * EVAL_STATUS_PRESTART
+ * EVAL_STATIS_INPROGRESS
+ * EVAL_STATUS_COMPELTE
+ * 
+ * @global moodle_database $DB
+ * @param  mixed $eval Either an object that can be grabed from the evaluations table
+ *              or an int that is the evaluation id from that table.
+ * @return int  The current status of the evaluation.
+ */
 function eval_check_status($eval) {
     global $DB;
     $status = '';
@@ -156,16 +132,20 @@ function eval_check_status($eval) {
 
     if ($eval->complete == 1) { //ONLY COMPLETE
         if ($eval->end_time > $current_time) {
-            return -1;
+            return EVAL_STATUS_COMPLETE_BEFORE_ENDTIME;
         }
 
-        return 3;
+        return EVAL_STATUS_COMPLETE;
     } elseif ($eval->complete == 0) { //Not COMPLETE
         $current_time = time();
 
 
         if ($eval->end_time < $current_time) {//check if end is already past
+            //If it has then set the evaluation as complete.
             if (set_eval_complete($eval) > 0) {
+                //The above will have returned 1 if update was successful.
+                
+                //Now that it was marked as complete let's check the status again.
                 return eval_check_status($eval);
             }
         }
@@ -173,48 +153,62 @@ function eval_check_status($eval) {
 
         //in progress
         if ($eval->start_time <= $current_time && $eval->end_time > $current_time) {
-            return 2;
+            return EVAL_STATUS_INPROGRESS;
         }
 
         //not started
         if ($eval->start_time >= $current_time && $eval->end_time > $current_time) {
-            return 1;
+            return EVAL_STATUS_PRESTART;
         }
     }
 
-    return 0;
+    return EVAL_STATUS_ERROR;
 }
 
+/**
+ * Set the given evaluation as complete.
+ * 
+ * @global moodle_database $DB
+ * @param stdClass $eval a object that represents an entry in the evaluations table.
+ * @return int 1 if successful 0 otherwise.
+ */
 function set_eval_complete($eval) {
     global $DB;
-
+    
+    //Create the database entry 
     $new_eval = new stdClass();
     $new_eval->id = $eval->id;
     $new_eval->complete = 1;
 
+    //Update the database.
     if ($DB->update_record('evaluations', $new_eval)) {
-        $eval->complete = 1;
-
+        
+        //Triger an event... for some reason...
         $eventdata = new object();
         $eventdata->component = 'local/evaluations';    // path in Moodle
         $eventdata->name = 'eval_complete';        // type of message from that module (as module defines it)
-        $eventdata->eval_id = $eval->id;      // user object
+        $eventdata->eval_id = $eval->id; 
 
         events_trigger('eval_complete', $eventdata);
-
+        
         return 1;
     }
-
+    //If update failed then return 0.
     return 0;
 }
 
+/**
+ * Count the number of responses for the evaluation with the given id.
+ * 
+ * @global moodle_database $DB
+ * @param int $eval_id an evaluation id.
+ * @return int The number of responses to the given evaluation.
+ */
 function get_eval_reponses_count($eval_id) {
     global $DB;
 
     $sql = "SELECT count(DISTINCT r.user_id) FROM {evaluation_response} r,{evaluation_questions} q,{evaluations} e
   WHERE r.question_id = q.id AND q.evalid = e.id AND q.evalid = $eval_id";
-
-
 
     return $DB->count_records_sql($sql);
 }
@@ -1264,22 +1258,6 @@ function get_users_by_capability_search($context, $capability, $fields = '',
     return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
 }
 
-function remove_invigilator($invig_id) {
-    global $DB;
-
-    $DB->delete_records('evaluations_invigilators', array('id' => $invig_id));
-}
-
-function add_invigilator($evalid, $userid) {
-    global $DB;
-
-    $data = new stdClass();
-    $data->evalid = $evalid;
-    $data->userid = $userid;
-
-    $DB->insert_record('evaluations_invigilators', $data);
-}
-
 /**
  * Generates a list of departments that are in the system.
  * 
@@ -1345,6 +1323,15 @@ function get_departments() {
     return $dept;
 }
 
+/**
+ * Determines if the given user is the administrator of the given department.
+ * 
+ * @global moodle_database $DB
+ * @param String $dept The department code that you want to check. (The keys from
+ *      get_departments())
+ * @param stdClass $user a user object from the database.
+ * @return boolean  Wehther or not the given user is an admin for the given department.
+ */
 function is_dept_admin($dept, $user) {
     global $DB;
 

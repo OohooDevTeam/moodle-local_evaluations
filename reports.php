@@ -90,10 +90,10 @@ if (is_dept_admin($dept, $USER)) {
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url);
     
     if (empty($searchstring)) {
-        $courses = get_courses_page($categoryid = "all", $sort = "c.fullname ASC", $fields = "c.*", &$totalcount, $perpage * $page, $perpage);
+        $courses = get_courses_page($categoryid = "all", $sort = "c.fullname ASC", $fields = "c.*", $totalcount, $perpage * $page, $perpage);
     } else {
         $searchterms = explode(" ", $searchstring);
-        $courses = get_courses_search($searchterms, "fullname ASC", 0, 50, &$totalcount);
+        $courses = get_courses_search($searchterms, "fullname ASC", 0, 50, $totalcount);
     }
 } else {
     print_error(get_string('restricted', 'local_evaluations'));
