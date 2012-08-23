@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ************************************************************************
  * *                              Evaluation                             **
@@ -144,7 +145,6 @@ function eval_check_status($eval) {
             //If it has then set the evaluation as complete.
             if (set_eval_complete($eval) > 0) {
                 //The above will have returned 1 if update was successful.
-                
                 //Now that it was marked as complete let's check the status again.
                 return eval_check_status($eval);
             }
@@ -174,7 +174,7 @@ function eval_check_status($eval) {
  */
 function set_eval_complete($eval) {
     global $DB;
-    
+
     //Create the database entry 
     $new_eval = new stdClass();
     $new_eval->id = $eval->id;
@@ -182,15 +182,15 @@ function set_eval_complete($eval) {
 
     //Update the database.
     if ($DB->update_record('evaluations', $new_eval)) {
-        
+
         //Triger an event... for some reason...
         $eventdata = new object();
         $eventdata->component = 'local/evaluations';    // path in Moodle
         $eventdata->name = 'eval_complete';        // type of message from that module (as module defines it)
-        $eventdata->eval_id = $eval->id; 
+        $eventdata->eval_id = $eval->id;
 
         events_trigger('eval_complete', $eventdata);
-        
+
         return 1;
     }
     //If update failed then return 0.
@@ -214,6 +214,7 @@ function get_eval_reponses_count($eval_id) {
 }
 
 /**
+ * Gets the user ids for each user that has responded to the given evaluation.
  * 
  * @global type $DB
  * @param type $eval_id
@@ -229,15 +230,12 @@ function get_eval_uids($eval_id) {
 }
 
 /**
- *
- * @global type $DB
- * @param type $evalid
- * @param type $userid
- * @return type 
+ * Get all the responses for the given evaluation from the given user.
  * 
- * This function needs to be modified still. We should probably ignore question types that have comments of any sort.
- * Ignores comment type questions. they have id 1 (or they should).
- * Sql can probably sort that out. Just sayin
+ * @global moodle_database $DB
+ * @param int $evalid   The id of the evaluation.
+ * @param int $userid   The id of the user.
+ * @return stdClass[]   Records from moodle database.
  */
 function get_responses_for_user($evalid, $userid) {
     global $DB;
@@ -249,6 +247,14 @@ function get_responses_for_user($evalid, $userid) {
     return $DB->get_records_sql($SQL);
 }
 
+/**
+ * Get all the comments for the given evaluation from the given user.
+ * 
+ * @global moodle_database $DB
+ * @param int $evalid   The id of the evaluation.
+ * @param int $userid   The id of the user.
+ * @return stdClass[]   Records from moodle database.
+ */
 function get_user_comments($evalid, $userid) {
     global $DB;
 
@@ -260,7 +266,7 @@ function get_user_comments($evalid, $userid) {
 }
 
 /**
- * Selects the number of standard questions
+ * Counts the number of standard questions
  */
 function count_std_questions($dept) {
     global $DB;
@@ -270,12 +276,20 @@ function count_std_questions($dept) {
     return $DB->count_records_sql($SQL);
 }
 
+/**
+ * Delete the given evaluation. Can only be done before the evaluation has started.
+ * 
+ * @global moodle_database $DB
+ * @param int $eval_id  The id of the evaluation you want to delete.
+ * @return boolean  Whether or not the deletion was successful.
+ */
 function delete_eval($eval_id) {
     global $DB;
 
     $status = eval_check_status($eval_id);
 
-    if ($status != 1) {
+    //Make sure the status is prestart.
+    if ($status != EVAL_STATUS_PRESTART) {
         return false;
     }
 
@@ -286,12 +300,20 @@ function delete_eval($eval_id) {
     $DB->update_record('evaluations', $eval);
 }
 
+/**
+ * This funnction function forces an evaluation to start before it's start time.
+ * 
+ * @global moodle_database $DB
+ * @param int $eval_id  The id of the evaluation that you want updated.
+ * @return boolean  Whether or not the update was successful.
+ */
 function force_start_eval($eval_id) {
     global $DB;
 
     $status = eval_check_status($eval_id);
 
-    if ($status != 1) {
+    //Can only force a evaluation to start if it is in the prestart stage.
+    if ($status != EVAL_STATUS_PRESTART) {
         return false;
     }
 
@@ -302,24 +324,33 @@ function force_start_eval($eval_id) {
     $DB->update_record('evaluations', $eval);
 }
 
-//same as set_eval_complete except it only needs id
-//could most likley be merged with set_eval_complete,
-//but I'm not sure if they where split for a specific reason
-//@TODO determine if functions can be joined
+/**
+ * Force already inprogress evaluations to become complete.
+ * 
+ * @global moodle_database $DB
+ * @param type $eval_id
+ * @return boolean
+ */
 function force_complete_eval($eval_id) {
+    /**
+     * same as set_eval_complete except it only needs id
+     * could most likley be merged with set_eval_complete,
+     * but I'm not sure if they where split for a specific reason - James
+     */
     global $DB;
 
+    
     $status = eval_check_status($eval_id);
-
-    if ($status != 2) {
+    
+    if ($status != EVAL_STATUS_INPROGRESS) {
         return false;
     }
 
     $eval = new stdClass();
     $eval->id = $eval_id;
     $eval->end_time = time();
-    $eval->complete = 1;
-
+    $eval->complete = EVAL_STATUS_PRESTART;
+    
     if ($DB->update_record('evaluations', $eval)) {
 
         $eventdata->component = 'local/evaluations';    // path in Moodle
@@ -358,6 +389,7 @@ function questionCreation_mform(&$mform) {
     $repeatarray[] = &$mform->createElement('select', 'question_type_id',
                     get_string('type_c', 'local_evaluations'),
                     $question_types_choices, $attributes);
+    
     //james down up delete button
     $mform->registerNoSubmitButton('delete_question_x');
     $mform->registerNoSubmitButton('swapup_question_x');
@@ -389,6 +421,11 @@ function questionCreation_mform(&$mform) {
     return $repeatarray;
 }
 
+/**
+ * No idea... Sorry, will fill in later if I figure it out.
+ * @param type $fromform
+ * @return type
+ */
 function process_question_postdata($fromform) {
 
     if (isset($fromform->questionid_x)) {
@@ -415,17 +452,32 @@ function process_question_postdata($fromform) {
     return $questions;
 }
 
-//conditional - returned array from post IF button pressed
-//class - The class of function to be created
-//function - the function to be called on that class object
-function question_button_event($conditional, $function, $class,
+/**
+ * This performs an action on the question which is detailed in $_REQUEST['questionid_x'].
+ * 
+ * This is a terrible designed way to do this. to change it.
+ * 
+ * @param String $command The action you want performed. Can be any of the following:
+ *      - "delete_question_x"
+ *      - "swapup_question_x"
+ *      - "swapdown_question_x"
+ *  If this command does not exist in the $_REQUEST variable then this function will fail.
+ * 
+ * @param String $function The function name that performs the command with the given 
+ *      class.
+ * @param String $class The class that the function will be called on =/
+ * @param $parameter Any parameters you want passed into the function.
+ * @return boolean|string  Returns false if the command failed. it will return the
+ *  div id of the question otherwise. (So we can show that div when we load the page.)
+ */
+function question_button_event($command, $function, $class,
         $parameter = null) {
     $returnQuestion = false;
 
-//delete button pressed
-    if (isset($_REQUEST[$conditional])) {
+    //delete button pressed
+    if (isset($_REQUEST[$command])) {
         $question_id = $_REQUEST['questionid_x'];
-        $delete_buttons = $_REQUEST[$conditional];
+        $delete_buttons = $_REQUEST[$command];
         foreach ($delete_buttons as $order => $delete_button) {
             $returnQuestion = $order;
             $returnQuestion++;
@@ -436,12 +488,9 @@ function question_button_event($conditional, $function, $class,
         }
     }
 
-
     if ($returnQuestion === false) {
         return false;
     }
-
-
 
     if ($function == 'delete' || $function == 'order_swapup') {
         $returnQuestion--;
@@ -457,6 +506,12 @@ function question_button_event($conditional, $function, $class,
     return '#q' . $returnQuestion++;
 }
 
+/**
+ * No idea... Sorry, will fill in later if I figure it out.
+ * 
+ * @param type $fromform
+ * @return \stdClass
+ */
 function process_reponse_postdata($fromform) {
 
     $responses = array();
@@ -537,7 +592,14 @@ function process_question_type_file($dir, $file) {
     }
 }
 
-//Function will be called from a cron controlled function
+/**
+ * 
+ * @global moodle_database $DB
+ * @global type $CFG
+ * @param type $eval
+ * @param type $course
+ * @return type
+ */
 function send_student_reminders($eval, $course) {
     global $DB, $CFG;
 
@@ -813,6 +875,14 @@ function eval_complete_message($eval) {
     }
 }
 
+/**
+ * Calculate the mean, median, mode or range.
+ * @param int[] $array The data set.
+ * @param String $output What you want as output. Either "range", "median", "mode", or "range.
+ *      Defaults to "mean".
+ * @return mixed    false if the calculation failed otherwise the calcuated value which
+ *      was specified.
+ */
 function mmmr($array, $output = 'mean') {
     if (!is_array($array)) {
         return FALSE;

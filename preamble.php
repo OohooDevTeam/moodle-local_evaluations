@@ -23,7 +23,7 @@ require_once('locallib.php');
 
 // ----- Parameters ----- //
 $eval_id = required_param('eval_id', PARAM_INT);
-
+$context = get_context_instance(CONTEXT_SYSTEM);
 
 // ----- Security ----- //
 require_login();
@@ -40,7 +40,6 @@ $navlinks = array(
 $nav = build_navigation($navlinks);
 
 // ----- Stuff ----- //
-$context = get_context_instance(CONTEXT_SYSTEM);
 $PAGE->set_context($context);
 $PAGE->set_url($CFG->wwwroot . '/local/evaluations/preamble.php');
 $PAGE->set_title(get_string('nav_ev_mn', 'local_evaluations'));

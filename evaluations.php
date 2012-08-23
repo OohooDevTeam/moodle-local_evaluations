@@ -29,6 +29,7 @@ $perpage = optional_param('perpage', 10, PARAM_INT);   // how many per page
 $searchstring = optional_param('search', false, PARAM_RAW);
 $courseid = optional_param('cid', false, PARAM_INT);
 $dept = optional_param('dept', false, PARAM_TEXT);
+$context = get_context_instance(CONTEXT_SYSTEM);
 
 
 // ----- Navigation ----- //
@@ -60,9 +61,7 @@ $nav = build_navigation($navlinks);
 //If dept isn't specified here it will still redirect properly to the dept selection
 //page.
 $PAGE->set_url($CFG->wwwroot . '/local/evaluations/evaluations.php?dept=' . $dept);
-
 $PAGE->requires->css('/local/evaluations/style.css');
-$context = get_context_instance(CONTEXT_SYSTEM);
 $PAGE->set_context($context);
 $PAGE->set_title(get_string('nav_ev_course', 'local_evaluations'));
 $PAGE->set_heading(get_string('nav_ev_course', 'local_evaluations'));

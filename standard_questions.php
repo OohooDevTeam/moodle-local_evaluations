@@ -14,26 +14,25 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
-// Redirects to correct archives home page
+/**
+ * This page handles the addition and removal of standard questions for each 
+ * department.
+ */
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-global $CFG;
-
 require_once('locallib.php');
 require_once('forms/standard_questions_form.php');
 
+// ----- Parameters ---- //
 $dept = required_param('dept', PARAM_TEXT);
-
-//security check
 $context = get_context_instance(CONTEXT_SYSTEM);
-$PAGE->set_context($context);
+
+// ----- Security ----- //
+require_login();
 if (!is_dept_admin($dept, $USER)) {
     print_error(get_string('restricted', 'local_evaluations'));
 }
 
-
-$PAGE->set_url($CFG->wwwroot . '/local/evaluations/standard_questions.php');
-
+// ----- Navigation ----- //
 $navlinks = array(
     array(
         'name' => get_string('nav_ev_mn', 'local_evaluations'),
@@ -56,21 +55,22 @@ $navlinks = array(
         'type' => 'misc'
     )
 );
-
 $nav = build_navigation($navlinks);
 
-
+// ----- Stuff ----- //
+$PAGE->set_url($CFG->wwwroot . '/local/evaluations/standard_questions.php');
+$PAGE->set_context($context);
 $PAGE->set_title(get_string('nav_st_qe', 'local_evaluations'));
 $PAGE->set_heading(get_string('nav_st_qe', 'local_evaluations'));
 $PAGE->requires->css('/local/evaluations/style.css');
-require_login();
 
 
 
-//CREATE FORM
+// ----- Output ----- //
 $standard_questions_form = new standard_questions_form($dept);
 
-//DEAL WITH SUBMISSION OF FORM
+
+//Handle form submission.
 $fromform = new stdClass();
 foreach ($_REQUEST as $key => $data) {
     $fromform->$key = $data;
@@ -80,21 +80,24 @@ if (property_exists($fromform, 'submitbutton')) {
     process_submission($fromform);
 } else if (property_exists($fromform, 'delete_question_x') || property_exists($fromform, 'swapup_question_x')
         || property_exists($fromform, 'swapdown_question_x') || property_exists($fromform, 'option_add_fields')) {
-//print_object($_REQUEST);exit();
+    
+    //Handle delete, swapups and swapdowns.
     $q_returns[] = question_button_event('delete_question_x', 'delete', 'standard_question');
     $q_returns[] = question_button_event('swapup_question_x', 'order_swapup', 'standard_question');
     $q_returns[] = question_button_event('swapdown_question_x', 'order_swapdown', 'standard_question');
 
+    //This will create a (#) link to the changed element on the page.
     $achor = '';
     foreach ($q_returns as $q_return) {
+        //Only one should not be false.
         if ($q_return != false) {
             $achor = $q_return;
             break;
         }
     }
 
-//Overwrite repeat options on redirect
-//Hackish - should change
+    //Overwrite repeat options on redirect
+    //Hackish - should change
     $additional = '';
     if (isset($_REQUEST['option_add_fields'])) {
         if ($achor == '') {
@@ -115,17 +118,13 @@ $standard_questions_form->display();
 echo $OUTPUT->footer();
 
 //Page Functions
-
 function process_submission($fromform) {
     global $CFG, $dept;
 
     $questions = process_question_postdata($fromform);
 
-
-
     $standard_question_set = new standard_question_set($dept, $questions);
     $standard_question_set->save();
-
 
     redirect($CFG->wwwroot . '/local/evaluations/admin.php?dept=' . $dept);
 }

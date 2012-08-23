@@ -24,6 +24,8 @@ $searchstring = optional_param('search', NULL, PARAM_RAW);
 $page = optional_param('page', 0, PARAM_INT);   // which page to show
 $perpage = optional_param('perpage', 10, PARAM_INT);   // how many per page
 $dept = optional_param('dept', false, PARAM_TEXT);
+$context = get_context_instance(CONTEXT_SYSTEM);
+
 // ----- Security ----- //
 require_login();
 
@@ -53,7 +55,6 @@ if ($dept) {
 $nav = build_navigation($navlinks);
 
 // ----- Stuff ----- //
-$context = get_context_instance(CONTEXT_SYSTEM);
 $PAGE->set_context($context);
 $PAGE->set_url($CFG->wwwroot . '/local/evaluations/reports.php');
 $PAGE->set_title(get_string('nav_reports', 'local_evaluations'));
