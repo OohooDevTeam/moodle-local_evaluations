@@ -339,9 +339,9 @@ function force_complete_eval($eval_id) {
      */
     global $DB;
 
-    
+
     $status = eval_check_status($eval_id);
-    
+
     if ($status != EVAL_STATUS_INPROGRESS) {
         return false;
     }
@@ -350,7 +350,7 @@ function force_complete_eval($eval_id) {
     $eval->id = $eval_id;
     $eval->end_time = time();
     $eval->complete = EVAL_STATUS_PRESTART;
-    
+
     if ($DB->update_record('evaluations', $eval)) {
 
         $eventdata->component = 'local/evaluations';    // path in Moodle
@@ -389,7 +389,7 @@ function questionCreation_mform(&$mform) {
     $repeatarray[] = &$mform->createElement('select', 'question_type_id',
                     get_string('type_c', 'local_evaluations'),
                     $question_types_choices, $attributes);
-    
+
     //james down up delete button
     $mform->registerNoSubmitButton('delete_question_x');
     $mform->registerNoSubmitButton('swapup_question_x');
@@ -422,31 +422,44 @@ function questionCreation_mform(&$mform) {
 }
 
 /**
- * No idea... Sorry, will fill in later if I figure it out.
- * @param type $fromform
- * @return type
+ * Extract questions information from the post data.
+ * 
+ * @param $fromform The data posted by the form.
+ * @return stdClass[] An array of questions.
  */
 function process_question_postdata($fromform) {
 
+    //Get a list of question ids
     if (isset($fromform->questionid_x)) {
         $question_ids = $fromform->questionid_x;
     } else {
         $question_ids = array();
     }
-    $questions = array();
 
+    //Get a list of all question text.
     if (!isset($fromform->question_x)) {
         $question_text = array();
     } else {
         $question_text = $fromform->question_x;
     }
+
+
+    //Put questions into a question array.
+    $questions = array();
     foreach ($question_ids as $order => $question_id) {
 
-        if (trim($question_text[$order]) == '' && $question_ids[$order] == 0)
+        //Make sure that any newly added questions aren't empty.
+        if (trim($question_text[$order]) == '' && $question_id == 0)
             continue;
 
-        $questions[$order] = (object) array('id' => $fromform->questionid_x[$order],
-                    'question' => $question_text[$order], 'type' => $fromform->question_type_id[$order], 'question_order' => $order, 'isstd' => $fromform->question_std[$order]);
+        //Create the question object.
+        $questions[$order] = (object) array(
+                    'id' => $fromform->questionid_x[$order],
+                    'question' => $question_text[$order],
+                    'type' => $fromform->question_type_id[$order],
+                    'question_order' => $order,
+                    'isstd' => $fromform->question_std[$order]
+        );
     }
 
     return $questions;
@@ -470,8 +483,7 @@ function process_question_postdata($fromform) {
  * @return boolean|string  Returns false if the command failed. it will return the
  *  div id of the question otherwise. (So we can show that div when we load the page.)
  */
-function question_button_event($command, $function, $class,
-        $parameter = null) {
+function question_button_event($command, $function, $class, $parameter = null) {
     $returnQuestion = false;
 
     //delete button pressed

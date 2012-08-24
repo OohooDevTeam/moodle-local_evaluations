@@ -193,7 +193,7 @@ function table_header() {
  * @param stdClass[] $evals An array of evaluations pulled from the database.
  */
 function print_evaluations($evals) {
-    global $dept;
+    global $CFG, $dept;
     if ($evals == null || count($evals) == 0) {
         //If there were no evaluations let the users know.
         echo '<tr><td colspan=8>' . get_string('none', 'local_evaluations') . '</td></tr>';
@@ -239,6 +239,7 @@ function print_evaluations($evals) {
 
         //output the evaluation row.
         echo '<tr>';
+        
         $href = $CFG->wwwroot . '/local/evaluations/evaluation.php?eval_id=' . $eval->id . '&dept=' . $dept;
         echo "<td><a href='$href'>" . $eval->name . "</a></td>";
 

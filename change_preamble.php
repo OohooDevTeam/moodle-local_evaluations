@@ -16,7 +16,7 @@
  * ************************************************************************
  * ********************************************************************** */
 /**
- * THis page allows users to change the preamble for their department.
+ * This page allows users to change the preamble for their department.
  */
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('forms/preamble_form.php');

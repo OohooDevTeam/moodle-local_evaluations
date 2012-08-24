@@ -152,11 +152,10 @@ class eval_form extends moodleform {
         if ($this->version == 'limited') {
             $loadQuestions = false;
         }
-        //print_r($this);exit();
+
         //Load question data - either exisiting questions or standard questions
         $evaluation->load_creation_form($mform, $this, $data, $loadQuestions);
         
-        //print_object($data);exit();
         $this->set_data($data);
         
         if(isset($data->question_x)){
@@ -164,8 +163,6 @@ class eval_form extends moodleform {
         }else{
             $mform->addElement('hidden','num_default_q',-1, 'id="num_default_q"');
         }
-        //print_r($data);
-        //die();
     }
 
     function definition_limited() {
