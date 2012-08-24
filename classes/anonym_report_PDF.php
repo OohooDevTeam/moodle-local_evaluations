@@ -15,7 +15,11 @@
  * ************************************************************************
  * ********************************************************************** */
 
-// Extend the TCPDF class to create custom Header and Footer
+/**
+ * This should reallllly be commented better... I'm leaving it to last because the
+ * way it works right now is ridiculously confusing and to get this page maintainable I 
+ * will need to do a crap ton of rewrites.
+ */
 class anonym_report_PDF extends TCPDF {
 
     private $eval;
@@ -54,7 +58,7 @@ class anonym_report_PDF extends TCPDF {
         $this->SetFont('times', 'B', 12);
 
         $questions = $DB->get_records('evaluation_questions',
-                array('evalid' => $eval->id));
+                array('evalid' => $eval->id), 'question_order ASC');
         $question_types = $DB->get_records('evaluations_question_types');
 
 
