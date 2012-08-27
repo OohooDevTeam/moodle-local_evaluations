@@ -132,7 +132,7 @@ foreach ($courses as $course) {
     $is_instructor = has_capability('local/evaluations:instructor',
             $course_context);
 
-    if (strpos($course->fullname, $dept) !== 0 || $is_instructor) {
+    if (!is_in_department($dept, $course) || $is_instructor) {
         continue;
     }
 

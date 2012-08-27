@@ -1343,8 +1343,8 @@ function get_users_by_capability_search($context, $capability, $fields = '',
 /**
  * Generates a list of departments that are in the system.
  * 
- * @return array    Returns an associative array with the department code as the 
- *      key and the the department name as the value.
+ * @return array    Returns an associative array with the a unique department code 
+ *      as the key and the the department name as the value.
  */
 function get_departments() {
     $dept = array("AGST" => "Agricultural Studies",
@@ -1424,4 +1424,15 @@ function is_dept_admin($dept, $user) {
                     get_context_instance(CONTEXT_SYSTEM));
 }
 
+/**
+ * Function to determine if a course falls within a certain department.
+ * 
+ * @param String $dept The department code that you want to check. (The keys from
+ *      get_departments())
+ * @param $course A moodle course extracted from the database. $DB->get_record('course', ...)
+ * @return boolean  Whether or not the course is in the given department.
+ */
+function is_in_department($dept, $course) {
+    return strpos($course->fullname, $dept) === 0;
+}
 ?>

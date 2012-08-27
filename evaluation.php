@@ -43,20 +43,7 @@ $is_instructor = has_capability('local/evaluations:instructor', $course_context)
 // ----- Security ----- //
 require_login();
 
-if (!is_dept_admin($dept, $USER)) {
-    print_error(get_string('restricted', 'local_evaluations'));
-}
-
-$your_administrations = $DB->get_records('department_administrators',
-        array('userid' => $USER->id));
-
-$your_depts = array();
-foreach ($your_administrations as $administration) {
-    $your_depts[$administration->department] = $department_list[$administration->department];
-}
-
-//If the key does not exist then he had no access to this department.
-if (!array_key_exists(substr($course->fullname, 0, 4), $your_depts) || $is_instructor) {
+if (!is_dept_admin($dept, $USER) || $is_instructor) {
     print_error(get_string('restricted', 'local_evaluations'));
 }
 

@@ -1,0 +1,58 @@
+-----------------------------------------
+-- IMPORTANT NOTE FOR OOHOO DEVELOPERS -- 
+-----------------------------------------
+* Don't skip this. It describes the process of changing the way departments work.
+* Which will likely be the first change they have you doing. You could make yourself look
+* super awesome by getting it done in 15 minutes. 
+
+This plugin was written for U of L so departments are determined by course name 
+rather than moodle category. It has however been designed so that this can easily
+be changed. There are 3 functions in locallib that handle everything related to 
+departments.
+
+//Returns a list of all department names and a unique key to identify each one. (That key could be the category id.)
+function get_departments(); 
+
+//Checks if a user is a department administrator. The $dept var would be the unique key assigned to the department.
+//You will not likely need to make changes to this function unless you decide to use permissions instead of the 
+//admin page. (Permissions wouldn't have worked for U of L)
+function is_dept_admin($dept, $USER); 
+
+//Checks if a course is in a department. The $dept var would be the unique key assigned to the department.
+//Right now it just makes sure the course title matches a specific format. It could be easily changed to
+//test if a course falls in a category with the given id. ($dept)
+function is_in_department($dept, $course); 
+
+If you decide to make any changes create a branch in git so that the U of L version of this
+stays intact. 
+
+* Your welcome. A thank you gift is not necessary but would not be turned down.
+* tl;dr: ... I said it was important. Go read it.
+
+---------------------------------------
+---------------- NOTES ----------------
+---------------------------------------
+ * Useful information but not super important. You could skip if you want to but
+ * I wouldn't.
+
+ - When I refer to global admins I refer to people with the admin capability for
+    this plugin. These people have the capability to make users department
+    administrators which will have the ability to make changes to evaluations
+    within their departments.
+
+-------------------------------------------
+---------------- OLD NOTES ----------------
+-------------------------------------------
+* Allowed to skip these, but they may be useful.
+
+Things to note & understand:
+-Some functionality relies on the fact that students are within the students role, and not a custom role
+-There is an admin capability that needs to be assigned to non-site admin that will need to be admins for the evaluations.
+-smtp needs to be setup, along with cron service to have reminders sent, and other functionality
+-Question types can be added, but please note the required elements that are needed (look at question_comment for the most basic setup required, and question_5_rate for a more complicated example)
+
+-tcpdf library is used for dynamic pdfs, and may take time to create (not cache or stored)
+-server SUPPORT EMAIL is contained in the emails sent by moodle
+-Theres a moodle bug where when an error is returned to a form - it doesn't want to load the data into date selectors without errors...(The data is sent to set_data function but nothing happens
+    -A hidden field has been added to fix the issue
+    -seems to only occur in the limited version of the eval_form

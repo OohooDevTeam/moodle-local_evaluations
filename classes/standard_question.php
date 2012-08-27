@@ -16,7 +16,11 @@
  * ********************************************************************** */
 
 /**
- * Description of standard_question
+ * This class defines the basic actions of standard questions in this plugin.
+ * 
+ * Standard questions are questions that appear on all evaluations within a
+ * department.
+ * 
  */
 require_once('question.php');
 

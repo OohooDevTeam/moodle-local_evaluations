@@ -111,7 +111,7 @@ if (isset($searchstring)) {
 
 echo '<form action=' . $PAGE->url . ' method="post"><table width="95%" cellpadding="1" style="text-align: center;">';
 foreach ($courses as $course) {
-    if (strpos($course->fullname, $dept) === 0) {
+    if (is_in_department($dept, $course)) {
         $evals = $DB->get_records('evaluations', array('course' => $course->id, 'deleted' => 0));
         echo '<tr>';
         if (isset($courseid)) {

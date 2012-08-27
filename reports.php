@@ -103,7 +103,7 @@ if (is_dept_admin($dept, $USER)) {
 //Display all reports by course.
 echo '<table cellpadding="1" style="text-align: center;">';
 foreach ($courses as $course) {
-    if (strpos($course->fullname, $dept) === 0) {
+    if (is_in_department($dept, $course)) {
         $current = time();
         //Get all completed evaluations in this course.
         $sql = "SELECT * 
