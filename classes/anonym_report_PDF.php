@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ************************************************************************
  * *                              Evaluation                             **
@@ -635,20 +636,9 @@ class anonym_report_PDF extends TCPDF {
         $this->SetFillColor(0, 0, 0);
         $this->SetTextColor(255, 255, 255);
         $this->SetFont('helvetica', 'B', 14);
-        //$course = $this->course->fullname."\n";
-        //$this->Cell(0, 15, $this->eval->name, 0,1, L, 1, '', 0);
-        //$this->Cell(0, 15, $this->eval->name, 0, 1, 'L', 0, '', 0, false, 'M', 'M');
-        //  $this->SetFont('helvetica', 'B', 14);
-        //  print_r($this->eval);
-        //  $this->Cell(0, 15, $course, 0, 1, 'C', 0, '', 0, false, 'M', 'M');
-        // // $this->Cell(0, 15, $course, 0,1, C, 1, '', 0);
-        //  $this->SetLineStyle(array('width' => 0.85 / $this->k, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0))); 
-        //  $this->Cell(($this->w - $this->original_lMargin - $this->original_rMargin), 0, '', 'T', 0, 'C');
-        //$this->Cell(0, 15, $this->eval->name, 0,1, L, 1, '', 0);
-        //$this->MultiCell(0, 5, $this->course->fullname, 1, 'C', 1, 0, '', '', true);
-        //ugh multicells. ($w, $h, $txt, $border=0, $align='J', $fill=0, $ln=1, $x='', $y='', $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0)
-        $this->MultiCell(0, 5, $this->course->fullname, 1, 'C', 1, 1, '', '',
-                true, 1, false, true, 10);
+        $this->MultiCell(0, 5,
+                $this->course->fullname . ' [' . $category->name . ']', 1, 'C',
+                1, 1, '', '', true, 1, false, true, 10);
         //$this->ln();
         $this->MultiCell(134, 5, $this->eval->name, 1, 'L', 1, 0, '', '', true);
 
