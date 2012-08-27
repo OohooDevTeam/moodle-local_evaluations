@@ -14,26 +14,37 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
-global $CFG;
+/**
+ * This represents a evaluation question which has 4 options 
+ * (Worst) [1 - 4] (Best)
+ */
 require_once($CFG->dirroot . '/local/evaluations/classes/question.php');
 
 class question_4_excellent extends question {
 
     public $type_name = "4-1 Excellent - poor"; //loaded to database on install / update
+    const averagable = true; //Can you calculate an average of this question
+    const medianable = true; //Can you calculate a median of this question
+    const modeable = true; //Can you calculate a mode of this question
+    const rangeable = true; //Can you calculate a range of this question
+    const count_responses = true; //Can you count the number of responses.
+    const max_rating = 4; //The highest possible rating for this question.
 
-    const averagable = true;
-    const medianable = true;
-    const modeable = true;
-    const rangeable = true;
-    const count_responses = true;
-    const max_rating = 4;
-
+    /**
+     * I can't find anywhere where this is used =/
+     * 
+     * @param type $mform
+     * @param type $form
+     * @param type $data
+     * @param type $order
+     */
     function display(&$mform, $form, $data, $order) {
+        //Add a new header for this question.
         $mform->addElement('header', "question_header_x[$order]", get_string('question', 'local_evaluations') . " $order");
 
         $mform->addElement('static', "question[$order]", '', '<b>' . $this->question . '</b>');
 
+        
         $abr = array(
             get_string('scale4_4', 'local_evaluations'),
             get_string('scale4_3', 'local_evaluations'),            

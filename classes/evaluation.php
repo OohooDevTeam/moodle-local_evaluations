@@ -1,20 +1,20 @@
 <?php
 
 /**
- * ************************************************************************
- * *                              Evaluation                             **
- * ************************************************************************
- * @package     local                                                    **
- * @subpackage  Evaluation                                               **
- * @name        Evaluation                                               **
- * @copyright   oohoo.biz                                                **
- * @link        http://oohoo.biz                                         **
- * @author      Dustin Durrand           				 **
- * @author      (Modified By) James Ward   				 **
- * @author      (Modified By) Andrew McCann				 **
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
- * ************************************************************************
- * ********************************************************************** */
+ * *********************************************************************** *
+ * *                              Evaluation                             * *
+ * *********************************************************************** *
+ * @package     local                                                    * *
+ * @subpackage  Evaluation                                               * *
+ * @name        Evaluation                                               * *
+ * @copyright   oohoo.biz                                                * *
+ * @link        http://oohoo.biz                                         * *
+ * @author      Dustin Durrand           				 * *
+ * @author      (Modified By) James Ward   				 * *
+ * @author      (Modified By) Andrew McCann				 * *
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later * *
+ * *********************************************************************** *
+ * **********************************************************************  */
 
 /**
  * This class handles all things related to creating and updating evaluations.
@@ -152,7 +152,7 @@ class evaluation {
     function load_questionSet($questions) {
         global $DB, $CFG;
 
-        
+
         $question_types = $DB->get_records('evaluations_question_types');
 
 
@@ -183,7 +183,7 @@ class evaluation {
                 print_error(get_string('error_question_type',
                                 'local_evaluations'));
             }
-            
+
             //Generate a new question with the question type's class and put it into the question set at the correct place.
             $this->questionSet[$order] = new $question_class($question->isstd, $question->id, $question->question, $question->type, $question->question_order, $DB_load);
         }
@@ -293,7 +293,7 @@ class evaluation {
         } else {//update existing eval
             $DB->update_record('evaluations', $eval);
         }
-        
+
         //Save each question.
         $this->save_questions();
     }

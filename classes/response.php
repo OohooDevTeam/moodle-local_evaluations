@@ -16,14 +16,14 @@
  * ********************************************************************** */
 
 /**
- * Description of response
+ * This class handles everything related to creating new responses.
  */
 class response {
-    private $id;
-    private $question_id;
-    private $response;
-    private $user_id;
-    private $comment;
+    private $id; //The database id of the response.
+    private $question_id; //The id of the question that this response is responding to.
+    private $response; //The value'd response if it exists. (4_excellent, 5_superior, 4_rate_wc)
+    private $user_id;  //The user who made this response.
+    private $comment; //The text response to a question if it exists. (comment, years)
     
     function __construct($id = 0, $question_id = null, $response= null, $user_id = null, $comment = '') {
         
@@ -39,6 +39,13 @@ class response {
         }
     }
     
+    /**
+     * Save new responses to the database. If the response has an id other than
+     * 0 then this method will fail because we should never allow a response
+     * to be edited.
+     * 
+     * @global moodle_database $DB
+     */
     function save(){
         global $DB;
         
@@ -46,6 +53,7 @@ class response {
             return; //WE SHOULD NEVER ALLOW A RESPONSE TO BE EDITED
         }
         
+        //Save the new response to the database.
         $response = new stdClass();
         $response->question_id = $this->question_id;
         $response->response = $this->response;
@@ -56,6 +64,11 @@ class response {
         
     }
     
+    /**
+     * Load contents of this response from the database.
+     * 
+     * @global moodle_database $DB
+     */
     function db_load(){
         global $DB;
         
@@ -71,8 +84,6 @@ class response {
         $this->response = $response->response;
         $this->user_id = $response->user_id;
         $this->comment = $response->comment;
-        
-        
     }
 
 }
