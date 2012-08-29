@@ -36,8 +36,7 @@ class response_form extends moodleform {
 
         $mform->addElement('header', 'question_response_header',
                 get_string('question_response_header', 'local_evaluations'));
-        $mform->addElement('html',
-                '<p>' . get_string('question_response_info', 'local_evaluations') . '</p>');
+        
 
         $evaluation = new evaluation(null, $this->evalid);
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ************************************************************************
  * *                              Evaluation                             **
@@ -23,11 +24,8 @@ require_once($CFG->dirroot . '/local/evaluations/classes/question.php');
 class question_4_excellent extends question {
 
     public $type_name = "4-1 Excellent - poor"; //loaded to database on install / update
-    const averagable = true; //Can you calculate an average of this question
-    const medianable = true; //Can you calculate a median of this question
-    const modeable = true; //Can you calculate a mode of this question
-    const rangeable = true; //Can you calculate a range of this question
-    const count_responses = true; //Can you count the number of responses.
+
+    const numeric = true;
     const max_rating = 4; //The highest possible rating for this question.
 
     /**
@@ -38,16 +36,19 @@ class question_4_excellent extends question {
      * @param type $data
      * @param type $order
      */
+
     function display(&$mform, $form, $data, $order) {
         //Add a new header for this question.
-        $mform->addElement('header', "question_header_x[$order]", get_string('question', 'local_evaluations') . " $order");
+        $mform->addElement('header', "question_header_x[$order]",
+                get_string('question', 'local_evaluations') . " $order");
 
-        $mform->addElement('static', "question[$order]", '', '<b>' . $this->question . '</b>');
+        $mform->addElement('static', "question[$order]", '',
+                '<b>' . $this->question . '</b>');
 
-        
+
         $abr = array(
             get_string('scale4_4', 'local_evaluations'),
-            get_string('scale4_3', 'local_evaluations'),            
+            get_string('scale4_3', 'local_evaluations'),
             get_string('scale4_2', 'local_evaluations'),
             get_string('scale4_1', 'local_evaluations'),
         );
@@ -57,12 +58,15 @@ class question_4_excellent extends question {
         $radioarray = array();
 
         for ($i = 0; $i < self::max_rating; $i++) {
-            $radioarray[] = &$mform->createElement('radio', "response[$order]", '', $abr[$i], self::max_rating - $i);
+            $radioarray[] = &$mform->createElement('radio', "response[$order]",
+                            '', $abr[$i], self::max_rating - $i);
         }
         $mform->setDefault("response[$order]", -1);
 
-        $mform->addGroup($radioarray, "response_grp[$order]", '', array('&nbsp;&nbsp;&nbsp;'), false);
-        $mform->addRule("response_grp[$order]", get_string('required'), 'required', null, 'client');
+        $mform->addGroup($radioarray, "response_grp[$order]", '',
+                array('&nbsp;&nbsp;&nbsp;'), false);
+        $mform->addRule("response_grp[$order]", get_string('required'),
+                'required', null, 'client');
 
         //$mform->addHelpButton("response_grp[$order]", 'question_5_rate', 'local_evaluations');
     }
@@ -71,39 +75,31 @@ class question_4_excellent extends question {
 
         //verbous equivilent
         $verbous = self::string_equiv($response);
-        $response = $response . get_string('question_4_rate_response', 'local_evaluations') . " : " . $verbous;
+        $response = $response . get_string('question_4_rate_response',
+                        'local_evaluations') . " : " . $verbous;
 
         $output = $response;
         return $output;
     }
 
-    static function is_averagable() {
-        return self::averagable;
-    }
-
-    static function is_medianable() {
-        return self::medianable;
-    }
-
-    static function is_modeable() {
-        return self::modeable;
-    }
-
-    static function is_rangeable() {
-        return self::rangeable;
-    }
-
-    static function is_count_responses() {
-        return self::count_responses;
+    static function is_numeric() {
+        return self::numeric;
     }
 
     static function average($responses) {
+        $sum = 0;
+        foreach ($responses as $response) {
+            $sum += $response;
+        }
+        return $sum / count($responses);
+    }
 
-        $total = self::max_rating;
-        $average = round(mmmr($responses, 'mean'), 4);
-        $verbous_average = self::string_equiv(round($average));
-        $output = get_string('average', 'local_evaluations') . ' ' . $average . '/' . $total . ' : ' . $verbous_average;
-        return $output;
+    static function isPositive($val) {
+        return $val >= 3;
+    }
+
+    static function isNegative($val) {
+        return $val <= 2;
     }
 
     static function median($responses) {
@@ -140,7 +136,8 @@ class question_4_excellent extends question {
                 $response_string .= get_string('poor', 'local_evaluations');
                 break;
             case 2:
-                $response_string .= get_string('unsatisfactory', 'local_evaluations');
+                $response_string .= get_string('unsatisfactory',
+                        'local_evaluations');
                 break;
             case 3:
                 $response_string .= get_string('good', 'local_evaluations');
@@ -204,14 +201,16 @@ class question_4_excellent extends question {
 
         /* Set the graph area */
         $myPicture->setGraphArea(100, 30, 480, 180);
-        $myPicture->drawGradientArea(100, 30, 480, 180, DIRECTION_HORIZONTAL, array("StartR" => 200, "StartG" => 200, "StartB" => 200, "EndR" => 240, "EndG" => 240, "EndB" => 240, "Alpha" => 30));
+        $myPicture->drawGradientArea(100, 30, 480, 180, DIRECTION_HORIZONTAL,
+                array("StartR" => 200, "StartG" => 200, "StartB" => 200, "EndR" => 240, "EndG" => 240, "EndB" => 240, "Alpha" => 30));
 
         /* Draw the chart scale */
         $scaleSettings = array("DrawXLines" => FALSE, "Mode" => SCALE_MODE_START0, "GridR" => 0, "GridG" => 0, "GridB" => 0, "GridAlpha" => 10, "Pos" => SCALE_POS_TOPBOTTOM);
         $myPicture->drawScale($scaleSettings);
 
         /* Turn on shadow computing */
-        $myPicture->setShadow(TRUE, array("X" => 1, "Y" => 1, "R" => 0, "G" => 0, "B" => 0, "Alpha" => 10));
+        $myPicture->setShadow(TRUE,
+                array("X" => 1, "Y" => 1, "R" => 0, "G" => 0, "B" => 0, "Alpha" => 10));
 
         /* Draw the chart */
         $myPicture->drawBarChart(array("Rounded" => TRUE, "Surrounding" => 30, "DisplayValues" => TRUE));

@@ -22,16 +22,19 @@ require_once('locallib.php');
 $action = required_param('action', PARAM_TEXT);
 $eval_id = required_param('eval_id', PARAM_INT);
 $dept = required_param('dept', PARAM_TEXT);
-$context = get_context_instance(CONTEXT_COURSE, $eval->course);
 
 // ----- Security ------ //
-if (has_capability('local/evaluations:instructor', $context) ||
-        !is_dept_admin($dept, $USER)) {
-    print_error(get_string('restricted', 'local_evaluations'));
-}
 
 if (!$eval = $DB->get_record('evaluations', array('id' => $eval_id))) {
     print_error(get_string('eval_id_invalid', 'local_evaluations'));
+}
+
+$context = get_context_instance(CONTEXT_COURSE, $eval->course);
+
+
+if (has_capability('local/evaluations:instructor', $context) ||
+        !is_dept_admin($dept, $USER)) {
+    print_error(get_string('restricted', 'local_evaluations'));
 }
 
 // ----- Main ----- //

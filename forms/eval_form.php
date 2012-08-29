@@ -107,20 +107,6 @@ class eval_form extends moodleform {
             $mform->addElement('select', 'eval_course_id', get_string('course_c', 'local_evaluations'), $course_choices, $attributes);
         }
 
-        //          //types
-        // $type_choices = array('online'=>get_string('online','local_evaluations'),'invig'=>get_string('invig','local_evaluations'));
-
-        $type_choices = array('online' => get_string('online', 'local_evaluations'));
-
-
-        if ($this->version == 'limited') {
-            $mform->addElement('hidden', 'eval_type', 0);
-        } else {
-            $attributes = array();
-            $mform->addElement('select', 'eval_type', get_string('type_c', 'local_evaluations'), $type_choices, $attributes);
-        }
-
-
         //Student email reminders
         $student_email_choices = array(get_string('no'), get_string('yes'));
         $attributes = array();

@@ -34,7 +34,7 @@ class evaluation {
 
     function __construct($dept, $eval_id = 0, $questions = array(),
             $course = null, $start_time = null, $end_time = null, $name = null,
-            $email_students = null, $complete = 0, $type = null, $db_load = true) {
+            $email_students = null, $complete = 0, $db_load = true) {
         global $DB;
 
         $this->dept = $dept; //Set the department.
@@ -74,7 +74,6 @@ class evaluation {
             $this->name = $name;
             $this->email_students = $email_students;
             $this->complete = $complete;
-            $this->type = $type;
 
             if (empty($questions)) {
                 $this->load_standard_questionSet();
@@ -185,7 +184,7 @@ class evaluation {
             }
 
             //Generate a new question with the question type's class and put it into the question set at the correct place.
-            $this->questionSet[$order] = new $question_class($question->isstd, $question->id, $question->question, $question->type, $question->question_order, $DB_load);
+            $this->questionSet[$order] = new $question_class($question->isstd, $question->id, $question->question, $question->type, $question->question_order, false);
         }
     }
 
@@ -210,7 +209,6 @@ class evaluation {
         $data->eval_time_start_display = $this->start_time; //only for limited
         $data->eval_time_end = $this->end_time;
         $data->eval_id = $this->eval_id;
-        $data->eval_type = trim("$this->type");
 
         if ($include_questions) { // If we are going to include questions - prepare forum and load their data
             $repeatarray = questionCreation_mform($mform);
@@ -257,7 +255,6 @@ class evaluation {
         $eval->name = $this->name;
         $eval->email_students = $this->email_students;
         $eval->complete = $this->complete;
-        $eval->type = $this->type;
         $eval->deleted = 0;
 
 

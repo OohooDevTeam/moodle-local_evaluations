@@ -58,18 +58,10 @@ if (!$course) {
 }
 
 // ----- Output ----- //
-//get teacher of course
-//right now it will get the last teacher in a course
-//maybe we should make it compile a list if there are more than 1 teachers.
-$teacherinfo = get_role_users(3, $course_context);
-$teacher = new stdClass();
-foreach ($teacherinfo as $t) {
-    $teacher->name = $t->firstname . " " . $t->lastname;
-}
-
+// 
 //Create a report pdf.
 ob_start(); //strange output from get_String that breaks pdf output unless we dump it
-$pdf = new Anonym_report_PDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false, $eval, $course, $teacher, $dept);
+$pdf = new Anonym_report_PDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false, $eval, $course, $dept);
 ob_end_clean(); //dump output this far
 $reportName = $course->fullname . "report";
 $pdf->Output($reportName, $download);

@@ -239,6 +239,18 @@ class question {
         $this->order--;
     }
 
+    function get_id() {
+        return $this->id;
+    }
+
+    function get_order() {
+        return $this->order;
+    }
+
+    function get_question() {
+        return $this->question;
+    }
+
 }
 
 ?>

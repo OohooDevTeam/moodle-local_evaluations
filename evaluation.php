@@ -139,7 +139,7 @@ function process_submission($fromform) {
 
     //Create a new evaluation with the posted data.
     $evaluation = new evaluation($dept, $fromform->eval_id, $questions, $fromform->eval_course_id, $start,
-                    $end, $fromform->eval_name, $fromform->student_email_toogle, $fromform->eval_complete, $fromform->eval_type, $db_load = false);
+                    $end, $fromform->eval_name, $fromform->student_email_toogle, $fromform->eval_complete, $db_load = false);
 
     //Save the evaluation.
     $evaluation->save();

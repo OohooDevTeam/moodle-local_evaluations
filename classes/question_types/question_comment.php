@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ************************************************************************
  * *                              Evaluation                             **
@@ -14,7 +15,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
 global $CFG;
 require_once($CFG->dirroot . '/local/evaluations/classes/question.php');
 
@@ -22,21 +22,21 @@ class question_comment extends question {
 
     public $type_name = "Comment"; //loaded to database on install / update
 
-    const averagable = false;
-    const medianable = false;
-    const modeable = false;
-    const rangeable = false;
-    const count_responses = false;
+    const numeric = false;
     const max_rating = 1; //Means nothing.
 
     function display(&$mform, $form, $data, $order) {
-        $mform->addElement('header', "question_header_x[$order]", get_string('question', 'local_evaluations') . " $order");
+        $mform->addElement('header', "question_header_x[$order]",
+                get_string('question', 'local_evaluations') . " $order");
 
-        $mform->addElement('static', "question[$order]", '', '<b>' . $this->question . '</b>');
+        $mform->addElement('static', "question[$order]", '',
+                '<b>' . $this->question . '</b>');
         $mform->addElement('hidden', "response[$order]", '');
         $mform->addElement('hidden', "questionid[$order]", $this->id);
 
-        $mform->addElement('textarea', "comments[$order]", get_string('comments', 'local_evaluations'), array('rows'=>8, 'cols'=>65));
+        $mform->addElement('textarea', "comments[$order]",
+                get_string('comments', 'local_evaluations'),
+                array('rows' => 8, 'cols' => 65));
         //$mform->addElement('htmleditor', "comments[$order]", get_string('comments', 'local_evaluations'));
         $mform->setType('text', PARAM_RAW);
     }
@@ -49,24 +49,8 @@ class question_comment extends question {
         return $output;
     }
 
-    static function is_averagable() {
-        return self::averagable;
-    }
-
-    static function is_medianable() {
-        return self::medianable;
-    }
-
-    static function is_modeable() {
-        return self::modeable;
-    }
-
-    static function is_rangeable() {
-        return self::rangeable;
-    }
-
-    static function is_count_responses() {
-        return self::count_responses;
+    static function is_numeric() {
+        return self::numeric;
     }
 
 }
