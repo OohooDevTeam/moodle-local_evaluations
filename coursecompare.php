@@ -15,6 +15,8 @@
  * ************************************************************************
  * ********************************************************************** */
 /**
+ * NOTE:: THIS PAGE IS NO LONGER USED. LEAVING IT HERE INCASE SOMEONE WANTS TO IMPLEMENT LATER.
+ * 
  * This page allows department administrators to decide what reports will be used
  * for comparisons when generating the reports.
  */

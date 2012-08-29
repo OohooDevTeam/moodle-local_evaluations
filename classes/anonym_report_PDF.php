@@ -72,6 +72,9 @@ class anonym_report_PDF extends TCPDF {
         $this->build_comment_list();
     }
 
+    /**
+     * Perform basic TCPDF setup.
+     */
     public function setup() {
         // set default header data
         $this->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH,
@@ -96,7 +99,13 @@ class anonym_report_PDF extends TCPDF {
         $this->SetFont('times', 'B', 12);
     }
 
-    //Page header
+    /**
+     * @override
+     * 
+     * Function to setup header that will be placed on each page.
+     * 
+     * @global moodle_database $DB
+     */
     public function Header() {
         global $DB;
 
@@ -123,7 +132,11 @@ class anonym_report_PDF extends TCPDF {
         $this->MultiCell(133, 5, $name, 1, 'R', 1, 0, '', '', true);
     }
 
-    // Page footer
+    /**
+     * @override
+     * 
+     * Function to setup footer that will be placed on each page. 
+     */
     public function Footer() {
         // Position at 15 mm from bottom
         $this->SetY(-15);
@@ -135,6 +148,12 @@ class anonym_report_PDF extends TCPDF {
                 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 
+    /**
+     * Print out the general information on the first page. This includes  response
+     * rate, number of questions and a list of all the questions.
+     * 
+     * @global moodle_database $DB
+     */
     private function print_general_info() {
         global $DB;
 
@@ -186,6 +205,19 @@ class anonym_report_PDF extends TCPDF {
         $this->ln();
     }
 
+    /**
+     * Buidls a response table for the each question passed in. A response table
+     * is a table that lists all the students (using anonymous ids) and their 
+     * numerical responses to the questions.
+     * 
+     * @global moodle_database $DB
+     * @param question[] $questions A set of question objects that represent the
+     *  questions you want responses for in this table.
+     * 
+     * @param boolean $global_stats Whether or not to use stats from across this
+     *  department whehn printing the statistics lines. This defaults to false
+     *  and will only output stats for the class as a result.
+     */
     private function build_response_table($questions, $global_stats = false) {
         global $DB;
 
@@ -318,6 +350,11 @@ class anonym_report_PDF extends TCPDF {
         $this->writeHTML($tbl, true, false, false, false, '');
     }
 
+    /**
+     * Creates a list of responses to all the comment questions.
+     * 
+     * @global moodle_database $DB
+     */
     private function build_comment_list() {
         global $DB;
         $comment_info = '';
@@ -341,13 +378,15 @@ class anonym_report_PDF extends TCPDF {
     }
 
     /**
-     * Gets the average of all the responses.
+     * Gets the average of all the responses
      * 
      * @param int[] $responses   A list of all the numerical responses for each 
      *  question
      * @param stdClass() $questions   A list of all all the questions that are 
      *  associated with the responses. Or a single question that all the reponses are for.
      *  There will always be the same number of responses as questions.
+     * 
+     * @return float The average of all the responses.
      */
     private function get_response_avg($responses, $questions) {
         if (count($responses) == 0) {
@@ -364,6 +403,19 @@ class anonym_report_PDF extends TCPDF {
         }
     }
 
+    /**
+     * Gets the number of positive responses as a percentage of the number of 
+     * responses.
+     * 
+     * @param int[] $responses   A list of all the numerical responses for each 
+     *  question
+     * @param stdClass() $questions   A list of all all the questions that are 
+     *  associated with the responses. Or a single question that all the reponses are for.
+     *  There will always be the same number of responses as questions.
+     * 
+     * @return float    A percent comparison between the number of positive 
+     *  responses and the number of responses.
+     */
     private function get_positive_response_rate($responses, $questions) {
         if (count($responses) == 0) {
             return;
@@ -387,6 +439,19 @@ class anonym_report_PDF extends TCPDF {
         }
     }
 
+    /**
+     * Gets the number of negative responses as a percentage of the number of 
+     * responses.
+     * 
+     * @param int[] $responses   A list of all the numerical responses for each 
+     *  question
+     * @param stdClass() $questions   A list of all all the questions that are 
+     *  associated with the responses. Or a single question that all the reponses are for.
+     *  There will always be the same number of responses as questions.
+     * 
+     * @return float    A percent comparison between the number of negative 
+     *  responses and the number of responses.
+     */
     private function get_negative_response_rate($responses, $questions) {
         if (count($responses) == 0) {
             return;
@@ -410,6 +475,13 @@ class anonym_report_PDF extends TCPDF {
         }
     }
 
+    /**
+     * Get a list of all students in the course. It Uses roles to determine if a
+     * user is a student.
+     * @global moodle_database $DB
+     * 
+     * @return stdClass[] an array of all users in the course. (moodle database records)
+     */
     private function get_course_users() {
         global $DB;
 
@@ -421,6 +493,13 @@ class anonym_report_PDF extends TCPDF {
         return $students;
     }
 
+    /**
+     * Get a list of all teachers in the course. It Uses roles to determine if a
+     * user is a teacher.
+     * @global moodle_database $DB
+     * 
+     * @return stdClass[] an array of all teachers in the course. (moodle database records)
+     */
     private function get_course_teachers() {
         global $DB;
 
@@ -431,6 +510,13 @@ class anonym_report_PDF extends TCPDF {
         return array_values($teachers);
     }
 
+    /**
+     * Gets the list of all standard questions for the evaluation.
+     * @global moodle_database $DB
+     * 
+     * @return stdClass[] an array of all standard questions for the 
+     *  evaluation. (moodle database records)
+     */
     private function get_eval_std_questions() {
         global $DB;
 
@@ -452,6 +538,13 @@ class anonym_report_PDF extends TCPDF {
         return $std_questions;
     }
 
+    /**
+     * Gets the list of all non-standard questions for the evaluation.
+     * @global moodle_database $DB
+     * 
+     * @return stdClass[] an array of all non-standard questions for the 
+     *  evaluation. (moodle database records)
+     */
     private function get_eval_nonstd_questions() {
         global $DB;
 
@@ -473,6 +566,12 @@ class anonym_report_PDF extends TCPDF {
         return $nonstd_questions;
     }
 
+    /**
+     * Gets the list of all comment questions in the evaluation.
+     * 
+     * @return stdClass[] an array of all comment questions for the 
+     *  evaluation. (moodle database records)
+     */
     private function get_eval_comments() {
         global $DB;
 

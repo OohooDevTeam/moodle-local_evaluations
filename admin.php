@@ -88,8 +88,8 @@ if ($dept !== false && is_dept_admin($dept, $USER)) {
             'local_evaluations') . '</a></li>';
     echo '<li><a href="' . $CFG->wwwroot . '/local/evaluations/standard_questions.php?dept=' . $dept . '">' . get_string('nav_st_qe',
             'local_evaluations') . '</a></li>';
-    echo '<li><a href="' . $CFG->wwwroot . '/local/evaluations/coursecompare.php?dept=' . $dept . '">' . get_string('nav_cs_mx',
-            'local_evaluations') . '</a></li>';
+//    echo '<li><a href="' . $CFG->wwwroot . '/local/evaluations/coursecompare.php?dept=' . $dept . '">' . get_string('nav_cs_mx',
+//            'local_evaluations') . '</a></li>'; //COURSE COMPARE WAS REMOVED LEAVING CODE IN SO IT CAN BE ADDED LATER
 
     echo '</ol>';
 } else {

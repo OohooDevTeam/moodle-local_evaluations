@@ -24,17 +24,6 @@ define('EVAL_STATUS_INPROGRESS', 2);
 define('EVAL_STATUS_COMPLETE', 3);
 
 /**
- * Get the courses that the given user is teaching
- * @global stdClass $USER
- * @return stdClass the result from the moodle function get_user_courses_bycap
- */
-function get_instructing_courses() {
-    global $USER;
-    return get_user_courses_bycap($USER->id, 'local/evaluations:instructor',
-                    array(), false, $sort = 'c.sortorder ASC', NULL, $limit = 20);
-}
-
-/**
  * Creates an html string that represents the given object.
  * 
  * @param  mixed $eval Either an object that can be grabed from the evaluations table
@@ -211,69 +200,6 @@ function get_eval_reponses_count($eval_id) {
   WHERE r.question_id = q.id AND q.evalid = e.id AND q.evalid = $eval_id";
 
     return $DB->count_records_sql($sql);
-}
-
-/**
- * Gets the user ids for each user that has responded to the given evaluation.
- * 
- * @global type $DB
- * @param type $eval_id
- * @return type 
- */
-function get_eval_uids($eval_id) {
-    global $DB;
-
-    $SQL = "SELECT DISTINCT user_id FROM {evaluation_response} r,{evaluation_questions} q,{evaluations} e
-  WHERE r.question_id = q.id AND q.evalid = e.id AND q.evalid = $eval_id";
-
-    return $DB->get_records_sql($SQL);
-}
-
-/**
- * Get all the responses for the given evaluation from the given user.
- * 
- * @global moodle_database $DB
- * @param int $evalid   The id of the evaluation.
- * @param int $userid   The id of the user.
- * @return stdClass[]   Records from moodle database.
- */
-function get_responses_for_user($evalid, $userid) {
-    global $DB;
-
-    $SQL = "SELECT question_id,response FROM {evaluation_response} r,{evaluation_questions} q,{evaluations} e, {evaluations_question_types} qt
-  WHERE r.user_id = $userid AND r.question_id = q.id AND q.evalid = e.id AND q.evalid = $evalid AND q.type = qt.id AND qt.class != 'comment' AND qt.class != 'years'"; // ORDERD BY question_id ASC";
-
-
-    return $DB->get_records_sql($SQL);
-}
-
-/**
- * Get all the comments for the given evaluation from the given user.
- * 
- * @global moodle_database $DB
- * @param int $evalid   The id of the evaluation.
- * @param int $userid   The id of the user.
- * @return stdClass[]   Records from moodle database.
- */
-function get_user_comments($evalid, $userid) {
-    global $DB;
-
-    $SQL = "SELECT question_id,question_comment, q.question FROM {evaluation_response} r,{evaluation_questions} q,{evaluations} e, {evaluations_question_types} qt
-  WHERE r.user_id = $userid AND r.question_id = q.id AND q.evalid = e.id AND q.evalid = $evalid AND q.type = qt.id AND (qt.class = 'comment' OR qt.class = 'years') ORDER BY question_id ASC"; // ORDERD BY question_id ASC";
-
-
-    return $DB->get_records_sql($SQL);
-}
-
-/**
- * Counts the number of standard questions
- */
-function count_std_questions($dept) {
-    global $DB;
-
-    $SQL = "SELECT COUNT(*) FROM {evaluation_standard_question} esq, {evaluations_question_types} qt WHERE esq.department = '$dept' AND esq.type = qt.id AND qt.class != 'comment'  AND qt.class != 'years'"; // ORDERD BY question_id ASC";
-
-    return $DB->count_records_sql($SQL);
 }
 
 /**
@@ -928,25 +854,6 @@ function mmmr($array, $output = 'mean') {
         }
         return $total;
     }
-}
-
-function count_students_in_course($courseid) {
-    global $DB;
-
-    $student_role = $DB->get_record('role', array('shortname' => 'student'));
-    $context = get_context_instance(CONTEXT_COURSE, $courseid);
-    $contextlists = get_related_contexts_string($context);
-
-    $sql = "SELECT count(u.id)
-            FROM {user} u
-            JOIN {role_assignments} ra ON ra.userid = u.id
-            WHERE  u.deleted = 0 AND u.confirmed = 1
-                AND ra.contextid $contextlists                  
-                AND ra.roleid = $student_role->id";
-
-    $student_count = $DB->count_records_sql($sql);
-
-    return $student_count;
 }
 
 function date_diff_format($d1, $d2) {
