@@ -14,7 +14,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
+/**
+ * Form for creating standard questions for a department.
+ */
 require_once("$CFG->libdir/formslib.php");
 require_once('classes/standard_question.php');
 require_once('classes/standard_question_set.php');
@@ -23,7 +25,11 @@ require_once('locallib.php');
 class standard_questions_form extends moodleform {
 
     private $dept;
-
+    
+    /**
+     * Constructor
+     * @param String $dept A department code.
+     */
     function __construct($dept) {
         $this->dept = $dept;
         parent::__construct();

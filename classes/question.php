@@ -35,7 +35,8 @@ class question {
      * @param boolean $isstd    Is this a standard question
      * @param int $id           The id of the question if it exists. Otherwise 0.
      * @param string $question  The text showing the question that's being asked.
-     * @param string $type
+     * @param int $type         The database question type id for the typoe of question
+     *                          that this represents.
      * @param int $order        The order in which this question will show up in
      *                          the list
      * @param boolean $DB_load  The default true means that the question is loaded 
