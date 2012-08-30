@@ -409,7 +409,7 @@ class anonym_report_PDF extends TCPDF {
      * 
      * @param int[] $responses   A list of all the numerical responses for each 
      *  question
-     * @param stdClass() $questions   A list of all all the questions that are 
+     * @param stdClass[] $questions   A list of all all the questions that are 
      *  associated with the responses. Or a single question that all the reponses are for.
      *  There will always be the same number of responses as questions.
      * 

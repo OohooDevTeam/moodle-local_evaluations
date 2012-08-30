@@ -82,10 +82,23 @@ class question_4_excellent extends question {
         return $output;
     }
 
+    /**
+     * Determine whether or not question has a numeric response. You can only 
+     * calculate statistics on numeric question types. Non numeric types are treated
+     * as comments.
+     * 
+     * @return boolean
+     */
     static function is_numeric() {
         return self::numeric;
     }
 
+    /**
+     * Calculate the average of a series of responses from numeric questions.
+     * 
+     * @param int[] $responses numeric response values.
+     * @return int  The average value.
+     */
     static function average($responses) {
         $sum = 0;
         foreach ($responses as $response) {
@@ -94,14 +107,37 @@ class question_4_excellent extends question {
         return $sum / count($responses);
     }
 
+    /**
+     * Determine if the given response is a positive response to a numeric question.
+     * 
+     * Positive responses count toward the %4/5 fields in the report.
+     * 
+     * @param int $val
+     * @return boolean
+     */
     static function isPositive($val) {
         return $val >= 3;
     }
 
+    /**
+     * Determine if the given response is a ngative response to a numeric question.
+     * 
+     * Negative responses count toward the %2/5 fields in the report.
+     * 
+     * @param int $val
+     * @return boolean
+     */
     static function isNegative($val) {
         return $val <= 2;
     }
 
+    /**
+     * Calculate the median value of a series of responses to a numeric question
+     *  
+     * @param int[] $responses numeric response values.
+     * @return string The string "median [value] : [status]" where status is the string
+     *  equivilent of the shown value.
+     */
     static function median($responses) {
 
         $median = round(mmmr($responses, 'median'), 4);
@@ -110,6 +146,13 @@ class question_4_excellent extends question {
         return $output;
     }
 
+    /**
+     * Calculate the mode value of a series of responses to a numeric question
+     *  
+     * @param int[] $responses numeric response values.
+     * @return string The string "mode [value] : [status]" where status is the string
+     *  equivilent of the shown value.
+     */
     static function mode($responses) {
 
         $mode = round(mmmr($responses, 'mode'), 4);
@@ -119,6 +162,12 @@ class question_4_excellent extends question {
         return $output;
     }
 
+    /**
+     * Calculate the range of a series of responses to a numeric question
+     *  
+     * @param int[] $responses numeric response values.
+     * @return string The string "range [value]"
+     */
     static function range($responses) {
 
         $range = mmmr($responses, 'range');
@@ -127,6 +176,12 @@ class question_4_excellent extends question {
         return $output;
     }
 
+    /**
+     * Determine the string equivilent of a given response value to a numeric question.
+     * 
+     * @param type $response
+     * @return type
+     */
     static function string_equiv($response) {
 
         $response_string = '';
@@ -151,6 +206,14 @@ class question_4_excellent extends question {
         return $response_string;
     }
 
+    /**
+     * Not Used. But it seems to draw a graph of some sort so am leaving it in a 
+     * reference.
+     *  
+     * @global type $CFG
+     * @param type $responses_data
+     * @return string
+     */
     static function count_responses($responses_data) {
         global $CFG;
         $count_selected_response = array(); //count how many times each option was selected
