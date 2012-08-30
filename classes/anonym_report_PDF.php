@@ -21,11 +21,6 @@ require_once('question_types/question_5_superior.php');
 require_once('question_types/question_comment.php');
 require_once('question_types/question_years.php');
 
-/**
- * This should reallllly be commented better... I'm leaving it to last because the
- * way it works right now is ridiculously confusing and to get this page maintainable I 
- * will need to do a crap ton of rewrites.
- */
 class anonym_report_PDF extends TCPDF {
 
     private $course;
@@ -313,8 +308,35 @@ class anonym_report_PDF extends TCPDF {
                 if (!array_key_exists($question->get_id(), $question_responses)) {
                     $question_responses[$question->get_id()] = array();
                 }
-                $response_list = $DB->get_records('evaluation_response',
-                        array('question_id' => $question->get_id()));
+                //-----
+                //We assume that standard questions show up in the same order on each page.
+                //Should standard questions change at any point then the evaluation statistics will
+                //become corrupt. A new design should be considered if someone ever has the time.
+                //I only have 5 hours left to fix this as best as I can so I'm stuck making this
+                //terrible assumption.
+                //-----
+                //Get list of all evaluations that are in the same department as this one.
+                $evaluation_list = $DB->get_records_select('evaluations',
+                        'department = \'' . $this->eval->department . '\'');
+
+                //Now get all questions that have the same order as this one.
+                $question_list = array();
+                foreach ($evaluation_list as $evaluation) {
+                    $question_list = array_merge($question_list,
+                            $DB->get_records('evaluation_questions',
+                                    array('question_order' => $question->get_order(), 'evalid' => $evaluation->id)));
+                }
+
+                $response_list = array();
+                //Now get responses for all these questions.
+                foreach ($question_list as $aQuestion) {
+                    $response_list = array_merge($response_list,
+                            $DB->get_records('evaluation_response',
+                                    array('question_id' => $aQuestion->id)));
+                }
+
+
+
                 foreach ($response_list as $response) {
                     $question_responses[$question->get_id()][] = $response->response;
                 }
