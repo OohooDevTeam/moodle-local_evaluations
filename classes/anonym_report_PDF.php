@@ -41,11 +41,12 @@ class anonym_report_PDF extends TCPDF {
         $this->dept = $dept;
         parent::__construct($orientation, $unit, $format, $unicode, $encoding,
                 $diskcache);
-
-        $this->teachers = $this->get_course_teachers();
-        $this->students = $this->get_course_users();
+        
+        //Must get stdquestions before students.
         $this->std_questions = $this->get_eval_std_questions();
         $this->nonstd_questions = $this->get_eval_nonstd_questions();
+        $this->teachers = $this->get_course_teachers();
+        $this->students = $this->get_course_users();
 
         $this->comments = $this->get_eval_comments();
 
@@ -502,7 +503,8 @@ class anonym_report_PDF extends TCPDF {
      * user is a student.
      * @global moodle_database $DB
      * 
-     * @return stdClass[] an array of all users in the course. (moodle database records)
+     * @return stdClass[] an array of all users in the course. This will only 
+     * return students who have responses.(moodle database records)
      */
     private function get_course_users() {
         global $DB;
@@ -511,6 +513,21 @@ class anonym_report_PDF extends TCPDF {
         $context = get_context_instance(CONTEXT_COURSE, $this->course->id);
 
         $students = array_values(get_role_users($role->id, $context));
+
+        //Remove students who did not respond. Note: You cannot partially respond
+        //in the current setup. Therefore if he responded he will have responded
+        // to all questions.
+        foreach ($students as $key => $student) {
+            $first_question = $this->std_questions[0];
+            $response = $DB->get_record('evaluation_response',
+                    array('question_id' => $first_question->get_id(), 'user_id' => $student->id));
+
+            if (!$response) {
+                unset($students[$key]);
+            }
+        }
+        //Re index the array.
+        $students = array_values($students);
 
         return $students;
     }
