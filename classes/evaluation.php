@@ -94,7 +94,6 @@ class evaluation {
 
     /**
      * Get the course id of the course that this evaluation belongs to.
-     * @return type
      */
     function get_course() {
         return $this->course;
@@ -163,7 +162,6 @@ class evaluation {
                 $questions = array();
             }
         }
-
 
         foreach ($questions as $order => $question) {
 

@@ -129,9 +129,11 @@ class question {
     }
 
     /**
-     * Delete this question in the evaluation with the given id. (Also apparently
-     * occurs in every other evaluation as well so the point of the eval_id 
-     * confuses me).
+     * Delete this question in the evaluation with the given id. 
+     * 
+     * Note: There is only a single instance of this question in the database. 
+     * There is no point of grabbing the eval_id because it's easy to grab later.
+     * However this is the way it was done... 
      *
      * @global moodle_database $DB
      * @param int $eval_id
