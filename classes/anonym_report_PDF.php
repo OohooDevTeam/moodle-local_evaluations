@@ -154,7 +154,11 @@ class anonym_report_PDF extends TCPDF {
         global $DB;
 
         //Response Rate
-        $total_students = count($this->students);
+        $role = $DB->get_record('role', array('archetype' => 'student'));
+        $context = get_context_instance(CONTEXT_COURSE, $this->course->id);
+
+        $all_students = array_values(get_role_users($role->id, $context));
+        $total_students = count($all_students);
         $responses = get_eval_reponses_count($this->eval->id);
 
         //calculates the percent submitted
