@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ************************************************************************
  * *                              Evaluation                             **
@@ -14,8 +15,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later **
  * ************************************************************************
  * ********************************************************************** */
-
-
 /**
  * This file keeps track of upgrades to the newmodule module
  *
@@ -147,22 +146,34 @@ function xmldb_local_evaluations_upgrade($oldversion) {
         $table->add_field('department', XMLDB_TYPE_TEXT, 'small', null,
                 XMLDB_NOTNULL, null, null);
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
         upgrade_plugin_savepoint(true, 2012080202, 'local', 'evaluations');
     }
-    
+
     if ($oldversion < 2012080300) {
 
         $table = new xmldb_table('evaluation_questions');
         $field = new xmldb_field('isstd', XMLDB_TYPE_INTEGER, '1', null,
-                XMLDB_NOTNULL, null, 1, 'question_order');
+                        XMLDB_NOTNULL, null, 1, 'question_order');
         $dbman->add_field($table, $field);
-        
+
         upgrade_plugin_savepoint(true, 2012080300, 'local', 'evaluations');
+    }
+
+    if ($oldversion < 2012083103) {
+
+        $table = new xmldb_table('evaluation_compare');
+        $field = new xmldb_field('evalid', XMLDB_TYPE_INTEGER, '10', null,
+                        XMLDB_NOTNULL, null, 1, 'id');
+        $dbman->add_field($table, $field);
+        $field2 = new xmldb_field('evalids', XMLDB_TYPE_TEXT, 'big', null,
+                        XMLDB_NOTNULL, null, null, 'id');
+        $dbman->drop_field($table, $field2);
+        upgrade_plugin_savepoint(true, 2012083103, 'local', 'evaluations');
     }
 
     return true;

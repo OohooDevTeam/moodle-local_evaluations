@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ************************************************************************
  * *                              Evaluation                             **
@@ -15,11 +16,13 @@
  * ************************************************************************
  * ********************************************************************** */
 /**
- * NOTE:: THIS PAGE IS NO LONGER USED. LEAVING IT HERE INCASE SOMEONE WANTS TO IMPLEMENT LATER.
- * 
  * This page allows department administrators to decide what reports will be used
  * for comparisons when generating the reports.
+ * 
+ * This will typically occur when they change the standard questions and no longer want to 
+ * use the stats from the old questions.
  */
+global $USER;
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once('locallib.php');
 
@@ -51,7 +54,7 @@ $navlinks = array(
     array(
         'name' => get_string('nav_admin', 'local_evaluations'),
         'link' => $CFG->wwwroot . '/local/evaluations/admin.php?dept=' . $dept,
-        'type' => 'misc' 
+        'type' => 'misc'
     ),
     array(
         'name' => get_string('nav_cs_mx', 'local_evaluations'),
@@ -72,28 +75,31 @@ $PAGE->requires->css('/local/evaluations/style.css');
 // ----- Handle Parameters ----- //
 if (isset($clear)) {
     //Remove all records from course compare if clear is selected
-    $DB->delete_records_select('evaluation_compare', '');
+    $evaluations = $DB->get_records_select('evaluations',
+            'department = \'' . $dept . '\'');
+    foreach ($evaluations as $evaluation) {
+        $DB->delete_records('evaluation_compare',
+                array('evalid' => $evaluation->id));
+    }
 } else if (!empty($_POST) && !isset($_POST['search']) && !isset($_POST['page']) && !isset($_POST['perpage'])) {
     //If search, page, and perpage are all empty then the page was probably submitted with 
-    //a list of courses that we want to compare.
-    $evalIds = '';
-    foreach ($_POST as $key => $value) {
-        $evalIds .= "$key;";
+    //a list of evaluations that we want to compare.
+    //-----------------------------------------------
+    //Delete the old ones.
+    $evaluations = $DB->get_records_select('evaluations',
+            'department = \'' . $dept . '\'');
+    foreach ($evaluations as $evaluation) {
+        $DB->delete_records('evaluation_compare',
+                array('evalid' => $evaluation->id));
     }
-    //G
-    $sql = "SELECT COUNT(*) FROM {$CFG->prefix}evaluation_compare";
-    if ($DB->count_records_sql($sql) > 0) {
-        $data = new stdClass();
-        $data->evalids = $evalIds;
-        //delete all the records from evaluation_compare
-        $DB->delete_records_select('evaluation_compare', '');
-        //add the new ones.
-        $DB->insert_record('evaluation_compare', $data);
-    } else {
-        $data = new stdClass();
-        $data->evalids = $evalIds;
-        $data->id = 1;
-        $DB->insert_record('evaluation_compare', $data);
+    
+    //Insert the new ones.
+    foreach ($_POST as $key => $value) {
+
+        $record = new stdClass();
+        $record->evalid = $key;
+
+        $DB->insert_record("evaluation_compare", $record);
     }
 }
 
@@ -103,18 +109,21 @@ echo $OUTPUT->header();
 
 if (isset($searchstring)) {
     $searchterms = explode(" ", $searchstring);
-    $courses = get_courses_search($searchterms, "fullname ASC", 0, 50, $totalcount);
+    $courses = get_courses_search($searchterms, "fullname ASC", 0, 50,
+            $totalcount);
 } else {
     $totalcount = $DB->count_records('course');
     $url = new moodle_url($CFG->wwwroot . '/local/evaluations/coursecompare.php', array('perpage' => $perpage));
     echo $OUTPUT->paging_bar($totalcount, $page, $perpage, $url);
-    $courses = get_courses_page($categoryid = "all", $sort = "c.fullname ASC", $fields = "c.*", $totalcount, $perpage * $page, $perpage);
+    $courses = get_courses_page($categoryid = "all", $sort = "c.fullname ASC",
+            $fields = "c.*", $totalcount, $perpage * $page, $perpage);
 }
 
 echo '<form action=' . $PAGE->url . ' method="post"><table width="95%" cellpadding="1" style="text-align: center;">';
 foreach ($courses as $course) {
     if (is_in_department($dept, $course)) {
-        $evals = $DB->get_records('evaluations', array('course' => $course->id, 'deleted' => 0));
+        $evals = $DB->get_records('evaluations',
+                array('course' => $course->id, 'deleted' => 0));
         echo '<tr>';
         if (isset($courseid)) {
             echo "<td colspan=8><b>$course->fullname </b><br> $singleCourseUrl</td>";
@@ -166,7 +175,7 @@ echo '</tr></table>';
 echo "Compare above courses: <input type='submit'/></form>";
 
 
-$clearurl = $PAGE->url . '?clear=true';
+$clearurl = $PAGE->url . '&clear=true';
 
 
 echo "

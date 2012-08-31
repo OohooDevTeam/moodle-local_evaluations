@@ -19,6 +19,7 @@
  * This represents a evaluation question which has 4 options 
  * (Worst) [1 - 4] (Best)
  */
+global $CFG;
 require_once($CFG->dirroot . '/local/evaluations/classes/question.php');
 
 class question_4_excellent extends question {

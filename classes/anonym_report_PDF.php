@@ -41,7 +41,7 @@ class anonym_report_PDF extends TCPDF {
         $this->dept = $dept;
         parent::__construct($orientation, $unit, $format, $unicode, $encoding,
                 $diskcache);
-        
+
         //Must get stdquestions before students.
         $this->std_questions = $this->get_eval_std_questions();
         $this->nonstd_questions = $this->get_eval_nonstd_questions();
@@ -316,9 +316,7 @@ class anonym_report_PDF extends TCPDF {
                 //-----
                 //We assume that standard questions show up in the same order on each page.
                 //Should standard questions change at any point then the evaluation statistics will
-                //become corrupt. A new design should be considered if someone ever has the time.
-                //I only have 5 hours left to fix this as best as I can so I'm stuck making this
-                //terrible assumption.
+                //become corrupt unless course compare page is changed.
                 //-----
                 //Get list of all evaluations that are in the same department as this one.
                 $evaluation_list = $DB->get_records_select('evaluations',
@@ -327,9 +325,12 @@ class anonym_report_PDF extends TCPDF {
                 //Now get all questions that have the same order as this one.
                 $question_list = array();
                 foreach ($evaluation_list as $evaluation) {
-                    $question_list = array_merge($question_list,
-                            $DB->get_records('evaluation_questions',
-                                    array('question_order' => $question->get_order(), 'evalid' => $evaluation->id)));
+                    if ($DB->get_record('evaluation_compare',
+                                    array('evalid' => $evaluation->id))) {
+                        $question_list = array_merge($question_list,
+                                $DB->get_records('evaluation_questions',
+                                        array('question_order' => $question->get_order(), 'evalid' => $evaluation->id)));
+                    }
                 }
 
                 $response_list = array();

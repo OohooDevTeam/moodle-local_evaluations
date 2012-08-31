@@ -18,7 +18,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2012080303;  // The current module version (Date: YYYYMMDDXX)
+$plugin->version = 2012083103;  // The current module version (Date: YYYYMMDDXX)
 $plugin->cron = 1; // set cron to 5 mins
 
                                                                                                             
