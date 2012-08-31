@@ -30,12 +30,6 @@ stays intact.
 * Your welcome. A thank you gift is not necessary but would not be turned down.
 * tl;dr: ... I said it was important. Go read it.
 
--- Part 2 -- 
-You may also be asked to re-implement the sytem for selecting which courses are compared in reports.
-This is all setup already in coursecompare.php some minor changes may need to be made to the report functions
-so that they only deal with the compared courses. There is also a commented out line in admin.php that will
-put the option for course compare back into the menu under "Department Administration"
-
 
 ---------------------------------------
 ---------------- NOTES ----------------
