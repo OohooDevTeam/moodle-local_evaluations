@@ -1,0 +1,12 @@
+Plugin: Evaluations
+
+This plugin is a tool for managing course evaluations and comparing statistics
+across a department.
+
+Prerequisites: None.
+
+Installation: Move the contents of this folder to
+ 
+/your_moodle_install/local/evaluations/
+
+Refer to the PDF documentation for more information: http://oohoo.biz
