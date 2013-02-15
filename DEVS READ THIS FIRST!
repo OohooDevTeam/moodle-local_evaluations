@@ -49,7 +49,7 @@ stays intact.
 
 Things to note & understand:
 -Some functionality relies on the fact that students are within the students role, and not a custom role
--There is an admin capability that needs to be assigned to non-site admin that will need to be admins for the evaluations.
+-There is an admin capability that needs to be assigned to non-site admin that will need to be [global] admins for the evaluations.
 -smtp needs to be setup, along with cron service to have reminders sent, and other functionality
 -Question types can be added, but please note the required elements that are needed (look at question_comment for the most basic setup required, and question_5_rate for a more complicated example)
 
